@@ -82,7 +82,7 @@ async function checkAdmin(user){
  if(error||!profile?.is_admin){$("admin").classList.remove("hidden");$("adminMessage").textContent="Acceso denegado: esta cuenta no tiene permiso de administrador.";return;}
  $("admin").classList.remove("hidden");await Promise.all([loadRequests(),loadProducts()]);
 }
-}let editingProductId=null;
+let editingProductId=null;
 
 function resetProductForm(){
  editingProductId=null;
