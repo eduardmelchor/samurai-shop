@@ -271,20 +271,36 @@ db.auth.onAuthStateChange((_event,session)=>{
 if(session?.user)showUser(session.user);
 });
 async function loadDemoSubscription(){
-const info=$("subscriptionInfo");
-const {data,error}=await db.from("demo_subscription_requests").select("status,requested_at,expires_at").order("requested_at",{ascending:false}).limit(10);
-if(error){info.textContent="No se pudo consultar tu suscripción: "+error.message;return;}
-const active=(data||[]).find(r=>r.status==="approved"&&r.expires_at&&new Date(r.expires_at)>new Date());
-const pending=(data||[]).find(r=>r.status==="pending");
-if(active){
-info.textContent="Suscripción demo activa hasta "+new Date(active.expires_at).toLocaleDateString("es-PE")+".";
-$("promoSection").classList.remove("hidden");
-}else{
-$("promoSection").classList.add("hidden");
-info.textContent=pending?"Tu solicitud está pendiente de revisión.":"No tienes una suscripción demo activa.";
-}
-$("requestSubscriptionBtn").disabled=!!pending;
-$("requestSubscriptionBtn").textContent=pending?"Solicitud pendiente":"Solicitar suscripción demo";
+  const info=$("subscriptionInfo");
+  const {data,error}=await db.from("demo_subscription_requests")
+    .select("status,requested_at,expires_at")
+    .order("requested_at",{ascending:false}).limit(10);
+
+  if(error){
+    info.textContent="No se pudo consultar tu suscripción: "+error.message;
+    return;
+  }
+
+  const active=(data||[]).find(r=>
+    r.status==="approved"&&r.expires_at&&new Date(r.expires_at)>new Date()
+  );
+
+  const pending=!active&&(data||[]).find(r=>r.status==="pending");
+
+  if(active){
+    info.textContent="Suscripción demo activa hasta "+
+      new Date(active.expires_at).toLocaleDateString("es-PE")+".";
+    $("promoSection").classList.remove("hidden");
+    $("subscriptionRequestMessage").textContent="Tu membresía demo está activa.";
+  }else{
+    $("promoSection").classList.add("hidden");
+    info.textContent=pending?"Tu solicitud está pendiente de revisión.":"No tienes una suscripción demo activa.";
+    $("subscriptionRequestMessage").textContent="";
+  }
+
+  $("requestSubscriptionBtn").disabled=!!active||!!pending;
+  $("requestSubscriptionBtn").textContent=
+    active?"Membresía activa":pending?"Solicitud pendiente":"Solicitar suscripción demo";
 }
 $("requestSubscriptionBtn").addEventListener("click",async()=>{
 const btn=$("requestSubscriptionBtn");
