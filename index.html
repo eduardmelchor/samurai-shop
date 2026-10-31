@@ -11,22 +11,12 @@ header{display:flex;justify-content:space-between;align-items:center;padding:17p
 main{max-width:1000px;margin:22px auto;padding:0 16px}.hero,.panel,.pack{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px}
 .hero{box-shadow:0 0 28px #087cff22}.hero h1{margin:8px 0}.muted{color:var(--muted)}.auth{max-width:430px;margin:30px auto}.tabs{display:flex;gap:8px}.tabs button{flex:1;background:#263957;color:white}.tabs .on,.primary{background:var(--gold);color:#151515}
 label{display:block;margin:12px 0 5px;font-size:14px}input{width:100%;padding:12px;border-radius:9px;border:1px solid #405575;background:#0a1426;color:white}
-form .primary{width:100%;margin-top:16px}.hidden{display:none!important}.balance{font-size:26px;color:var(--gold);font-weight:800}
+form .primary{width:100%;margin-top:16px}.hidden{display:none!important}
 .products{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));gap:12px;margin-top:14px;min-width:0}.pack{text-align:center;min-width:0;overflow-wrap:anywhere}.gem{font-size:28px}.price{color:var(--blue);font-weight:900;font-size:20px;margin:8px}
 .note{font-size:12px;line-height:1.5;color:var(--muted)}#message{margin-top:12px;color:var(--gold);font-size:14px}
-@media(max-width:1000px){
- main{padding:0 12px;margin:14px auto}
- .products{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
- .pack{padding:12px 8px;border-radius:14px}
- .pack b{font-size:14px;line-height:1.35;display:block}
- .price{font-size:18px;margin:7px 0}
- .pack button{width:100%;padding:10px 6px;font-size:13px}
- .hero,.panel{padding:14px;border-radius:15px}
-}
+@media(max-width:1000px){main{padding:0 12px;margin:14px auto}.products{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.pack{padding:12px 8px;border-radius:14px}.pack b{font-size:14px;line-height:1.35;display:block}.price{font-size:18px;margin:7px 0}.pack button{width:100%;padding:10px 6px;font-size:13px}.hero,.panel{padding:14px;border-radius:15px}}
 @media(max-width:360px){.products{grid-template-columns:1fr}.pack{padding:14px}}
-
 @media(max-width:480px){header{padding:14px}.brand{font-size:19px}}
-
 .samurai-cover{position:relative;isolation:isolate;overflow:hidden;text-align:center;margin:0 0 18px;padding:30px 16px 26px;border:1px solid #34578a;border-radius:20px;background:radial-gradient(ellipse at 50% 0%,#315b91 0%,#172d50 42%,#101a2d 100%);box-shadow:0 12px 34px #0005}
 .samurai-cover:before,.samurai-cover:after{content:"";position:absolute;z-index:-1;width:180px;height:180px;border:1px solid #ffffff20;transform:rotate(45deg);border-radius:28px}
 .samurai-cover:before{left:-110px;top:18px}.samurai-cover:after{right:-110px;bottom:-95px}
@@ -39,7 +29,7 @@ form .primary{width:100%;margin-top:16px}.hidden{display:none!important}.balance
 .shop-nav{position:sticky;top:0;z-index:20;display:flex;gap:8px;overflow-x:auto;white-space:nowrap;padding:9px;margin:0 0 16px;background:#0b1426ee;border:1px solid #284875;border-radius:13px;scrollbar-width:none}
 .shop-nav a{flex:1;text-align:center;text-decoration:none;color:#f5f7fb;background:#192944;border:1px solid #345078;border-radius:9px;padding:10px 12px;font-size:13px;font-weight:700}
 .shop-nav a:active{background:#ffc857;color:#151515}
-#home,#promoSection,#packagesSection,#ordersSection,#topupSection{scroll-margin-top:78px}
+#home,#promoSection,#packagesSection,#ordersSection{scroll-margin-top:78px}
 .promo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .promo-card{background:linear-gradient(145deg,#1b3153,#121d32);border:1px solid #345078;border-radius:13px;padding:14px;text-align:center;min-width:0}
 .promo-card .promo-icon{font-size:27px}.promo-card h3{font-size:15px;margin:7px 0;color:#ffc857}.promo-card p{font-size:11px;color:#aab8cf;line-height:1.5;margin:5px 0 0}
@@ -49,78 +39,100 @@ form .primary{width:100%;margin-top:16px}.hidden{display:none!important}.balance
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-<header><div class="brand">⚔️ SAMURAI <span>SHOP</span></div><a href="samurai-admin-demo-1.html" style="color:#ffc857;font-weight:bold;text-decoration:none">Panel admin</a><button id="logout" class="hidden">Cerrar sesión</button></header>
-<main>\n<p class="note" style="text-align:center">Versión de demostración: solicitudes y aprobaciones se guardan solo en este navegador.</p>
+<header>
+<div class="brand">⚔️ SAMURAI <span>SHOP</span></div>
+<a href="samurai-admin-demo-1.html" style="color:#ffc857;font-weight:bold;text-decoration:none">Panel admin</a>
+<button id="logout" class="hidden">Cerrar sesión</button>
+</header>
+<main>
+<p class="note" style="text-align:center">Versión de demostración: no hay saldo, recargas, cobros ni entrega de diamantes.</p>
 <section class="auth panel" id="auth">
- <h2 style="text-align:center">Bienvenido a Samurai Shop</h2>
- <p class="muted" style="text-align:center">Inicia sesión o crea tu cuenta</p>
- <div class="tabs"><button class="on" id="loginTab">Iniciar sesión</button><button id="registerTab">Crear cuenta</button></div>
- <form id="loginForm"><label>Correo electrónico</label><input id="loginEmail" type="email" required autocomplete="email"><label>Contraseña</label><input id="loginPassword" type="password" required autocomplete="current-password"><button class="primary">Entrar</button></form>
- <form id="registerForm" class="hidden"><label>Nombre de usuario</label><input id="username" minlength="3" required><label>Correo electrónico</label><input id="registerEmail" type="email" required autocomplete="email"><label>Contraseña (mínimo 8 caracteres)</label><input id="registerPassword" type="password" minlength="8" required autocomplete="new-password"><button class="primary">Crear cuenta</button></form>
- <p class="note">Las contraseñas las gestiona Supabase Auth. Puede que debas confirmar tu correo antes de iniciar sesión.</p><div id="message"></div>
+<h2 style="text-align:center">Bienvenido a Samurai Shop</h2>
+<p class="muted" style="text-align:center">Inicia sesión o crea tu cuenta</p>
+<div class="tabs">
+<button class="on" id="loginTab">Iniciar sesión</button>
+<button id="registerTab">Crear cuenta</button>
+</div>
+<form id="loginForm">
+<label>Correo electrónico</label>
+<input id="loginEmail" type="email" required autocomplete="email">
+<label>Contraseña</label>
+<input id="loginPassword" type="password" required autocomplete="current-password">
+<button class="primary">Entrar</button>
+</form>
+<form id="registerForm" class="hidden">
+<label>Nombre de usuario</label>
+<input id="username" minlength="3" required>
+<label>Correo electrónico</label>
+<input id="registerEmail" type="email" required autocomplete="email">
+<label>Contraseña (mínimo 8 caracteres)</label>
+<input id="registerPassword" type="password" minlength="8" required autocomplete="new-password">
+<button class="primary">Crear cuenta</button>
+</form>
+<p class="note">Las contraseñas las gestiona Supabase Auth. Puede que debas confirmar tu correo antes de iniciar sesión.</p>
+<div id="message"></div>
 </section>
 <section id="shop" class="hidden">
- <section class="samurai-cover" aria-label="Portada Samurai Shop">
-  <div class="cover-mark">⚔️</div>
-  <div class="cover-kicker">TIENDA GAMER</div>
-  <h1>SAMURAI <span>SHOP</span></h1>
-  <p>Tu próxima aventura comienza aquí</p>
-  <div class="cover-tags"><span>💎 DIAMANTES</span><span>🎮 FREE FIRE</span></div>
- </section>
- <nav class="shop-nav" aria-label="Navegación de la tienda">
-  <a href="#home">⌂ Inicio</a><a href="#promoSection">🔥 Ofertas</a><a href="#packagesSection">💎 Diamantes</a><a href="#ordersSection">📦 Pedidos</a><a href="#topupSection">💜 Recargar</a>
- </nav>
- <div class="hero" id="home"><h1>¡Bienvenido!</h1><p class="muted" id="welcome">Tu tienda de diamantes</p><div class="muted">Saldo de prueba</div><div class="balance" id="balance">Cargando…</div><p class="note">Saldo simulado en soles para probar la tienda. No es dinero real ni se puede retirar o transferir.</p></div>
- <section class="panel" id="playerVerification" style="margin-top:18px">
-  <h2>🛡️ Primero verifica tu ID</h2>
-  <p class="note">Antes de mostrar los paquetes, confirma tu ID de Free Fire. Escribe el ID y pulsa Verificar jugador.</p>
-  <label for="playerIdInput">ID de Free Fire</label>
-  <input id="playerIdInput" inputmode="numeric" autocomplete="off" maxlength="24" placeholder="Escribe tu ID numérico">
-  <button class="primary" id="verifyPlayerBtn" type="button" style="width:100%;margin-top:12px">Verificar jugador</button>
-  <div id="verificationMessage" class="note" aria-live="polite" style="margin-top:12px"></div>
- </section>
- <section class="panel" id="subscriptionStatus" style="margin-top:18px">
-  <h2>⚔️ Mi suscripción Samurai</h2>
-  <p class="note">La solicitud se guarda en Supabase. Solo una revisión autorizada puede activar esta suscripción demo por 30 días.</p>
-  <div id="subscriptionInfo" class="note" aria-live="polite">Consultando estado…</div>
-  <button class="primary" id="requestSubscriptionBtn" type="button" style="width:100%;margin-top:12px">Solicitar suscripción demo</button>
-  <div id="subscriptionRequestMessage" class="note" aria-live="polite" style="margin-top:10px"></div>
- </section>
- <section class="panel hidden" id="promoSection" style="margin-top:18px">
-  <h2>⚔️ Suscripción Samurai · 1 mes</h2>
-  <p class="note">Planes mensuales ilustrativos con los precios que propusiste. En esta versión no se activa una suscripción, no hay cobros recurrentes ni se entregan diamantes.</p>
-  <div class="promo-grid">
-   <article class="promo-card"><div class="promo-icon">💎</div><h3>110 diamantes</h3><p class="monthly-price">S/ 2.60</p><span class="promo-label">VIGENCIA ILUSTRATIVA: 1 MES</span></article>
-   <article class="promo-card"><div class="promo-icon">💎</div><h3>341 diamantes</h3><p class="monthly-price">S/ 8.00</p><span class="promo-label">VIGENCIA ILUSTRATIVA: 1 MES</span></article>
-   <article class="promo-card"><div class="promo-icon">💎</div><h3>572 diamantes</h3><p class="monthly-price">S/ 13.50</p><span class="promo-label">VIGENCIA ILUSTRATIVA: 1 MES</span></article>
-   <article class="promo-card"><div class="promo-icon">💎</div><h3>1,166 diamantes</h3><p class="monthly-price">S/ 23.50</p><span class="promo-label">VIGENCIA ILUSTRATIVA: 1 MES</span></article>
-   <article class="promo-card"><div class="promo-icon">💎</div><h3>2,398 diamantes</h3><p class="monthly-price">S/ 45.00</p><span class="promo-label">VIGENCIA ILUSTRATIVA: 1 MES</span></article>
-   <article class="promo-card"><div class="promo-icon">💎</div><h3>6,160 diamantes</h3><p class="monthly-price">S/ 115.00</p><span class="promo-label">VIGENCIA ILUSTRATIVA: 1 MES</span></article>
-  </div>
- </section>
+<section class="samurai-cover" aria-label="Portada Samurai Shop">
+<div class="cover-mark">⚔️</div>
+<div class="cover-kicker">TIENDA GAMER</div>
+<h1>SAMURAI <span>SHOP</span></h1>
+<p>Tu próxima aventura comienza aquí</p>
+<div class="cover-tags"><span>💎 DIAMANTES</span><span>🎮 FREE FIRE</span></div>
+</section>
+<nav class="shop-nav" aria-label="Navegación de la tienda">
+<a href="#home">⌂ Inicio</a>
+<a href="#promoSection">🔥 Ofertas</a>
+<a href="#packagesSection">💎 Diamantes</a>
+<a href="#ordersSection">📦 Pedidos</a>
+</nav>
+<div class="hero" id="home">
+<h1>¡Bienvenido!</h1>
+<p class="muted" id="welcome">Tu tienda de diamantes</p>
+</div>
+<section class="panel" id="userIdentity" style="margin-top:18px">
+<h2>🪪 Mi ID de usuario</h2>
+<p class="note">Este identificador único pertenece a tu cuenta Samurai Shop. No cambia al cerrar sesión.</p>
+<div id="accountUserId" style="padding:12px;background:#0a1426;border:1px solid #405575;border-radius:9px;overflow-wrap:anywhere;user-select:all;font-weight:700" aria-live="polite">Cargando ID…</div>
+<button class="primary" id="copyAccountUserId" type="button" style="margin-top:10px">Copiar mi ID</button>
+<p id="copyAccountUserIdMessage" class="note" aria-live="polite"></p>
+</section>
+<section class="panel" id="playerVerification" style="margin-top:18px">
+<h2>🛡️ Primero verifica tu ID</h2>
+<p class="note">Antes de mostrar los paquetes, confirma tu ID de Free Fire. Escribe el ID y pulsa Verificar jugador.</p>
+<label for="playerIdInput">ID de Free Fire</label>
+<input id="playerIdInput" inputmode="numeric" autocomplete="off" maxlength="24" placeholder="Escribe tu ID numérico">
+<button class="primary" id="verifyPlayerBtn" type="button" style="width:100%;margin-top:12px">Verificar jugador</button>
+<div id="verificationMessage" class="note" aria-live="polite" style="margin-top:12px"></div>
+</section>
+<section class="panel" id="subscriptionStatus" style="margin-top:18px">
+<h2>⚔️ Mi suscripción Samurai</h2>
+<p class="note">La solicitud se guarda en Supabase. Solo una revisión autorizada puede activar esta suscripción demo por 30 días.</p>
+<div id="subscriptionInfo" class="note" aria-live="polite">Consultando estado…</div>
+<button class="primary" id="requestSubscriptionBtn" type="button" style="width:100%;margin-top:12px">Solicitar suscripción demo</button>
+<div id="subscriptionRequestMessage" class="note" aria-live="polite" style="margin-top:10px"></div>
+</section>
+<section class="panel hidden" id="promoSection" style="margin-top:18px">
+<h2>⚔️ Suscripción Samurai · 1 mes</h2>
+<p class="note">Planes mensuales ilustrativos con los precios que propusiste. En esta versión no se activa una suscripción, no hay cobros recurrentes ni se entregan diamantes.</p>
+<div class="promo-grid">
+<article class="promo-card"><div class="promo-icon">💎</div><h3>110 diamantes</h3><p class="monthly-price">S/ 2.60</p><span class="promo-label">VIGENCIA ILUSTRATIVA: 1 MES</span></article>
+<article class="promo-card"><div class="promo-icon">💎</div><h3>341 diamantes</h3><p class="monthly-price">S/ 8.00</p><span class="promo-label">VIGENCIA ILUSTRATIVA: 1 MES</span></article>
+<article class="promo-card"><div class="promo-icon">💎</div><h3>572 diamantes</h3><p class="monthly-price">S/ 13.50</p><span class="promo-label">VIGENCIA ILUSTRATIVA: 1 MES</span></article>
+<article class="promo-card"><div class="promo-icon">💎</div><h3>1,166 diamantes</h3><p class="monthly-price">S/ 23.50</p><span class="promo-label">VIGENCIA ILUSTRATIVA: 1 MES</span></article>
+<article class="promo-card"><div class="promo-icon">💎</div><h3>2,398 diamantes</h3><p class="monthly-price">S/ 45.00</p><span class="promo-label">VIGENCIA ILUSTRATIVA: 1 MES</span></article>
+<article class="promo-card"><div class="promo-icon">💎</div><h3>6,160 diamantes</h3><p class="monthly-price">S/ 115.00</p><span class="promo-label">VIGENCIA ILUSTRATIVA: 1 MES</span></article>
+</div>
+</section>
 <section id="packagesSection" class="hidden" style="margin-top:18px">
-  <h2>💎 Paquetes de diamantes</h2>
-  <p class="note">ID verificado. Para comprar en esta prueba necesitas una suscripción demo vigente y créditos ficticios suficientes. No se entregan diamantes reales.</p>
-  <div class="products" id="productList">Cargando paquetes…</div>
-  <div id="purchaseMessage" class="note" aria-live="polite"></div>
- </section>
- <section class="panel" id="ordersSection" style="margin-top:18px">
-  <h3>📦 Mis pedidos</h3><div id="myOrders" class="note">Cargando pedidos…</div>
- </section>
-
-<section class="panel" id="topupSection" style="margin-top:20px">
- <h2>💜 Recargar saldo (demostración)</h2>
- <p class="note">Prototipo visual: selecciona un monto y un método para ver cómo sería el flujo. No se inicia un pago, no se suben comprobantes y no se modifica tu saldo.</p>
- <form id="topupForm">
-  <label for="topupAmount">Monto de demostración (S/)</label>
-  <input id="topupAmount" type="number" min="1" max="100" step="1" required placeholder="Ej. 10">
-  <label for="topupMethod">Método ilustrativo</label>
-  <select id="topupMethod" required style="width:100%;padding:12px;border-radius:9px;background:#0a1426;color:white;border:1px solid #405575">
-   <option value="">Selecciona un método</option><option value="Yape">Yape (solo demostración)</option><option value="Plin">Plin (solo demostración)</option>
-  </select>
-  <button class="primary" id="topupSubmit" type="submit" style="width:100%;margin-top:14px">Ver ejemplo de recarga</button>
-  <div id="topupMessage" class="note" aria-live="polite" style="margin-top:12px"></div>
- </form>
+<h2>💎 Paquetes de diamantes</h2>
+<p class="note">ID verificado. Esta sección es una demostración: las solicitudes no generan pagos ni entregan diamantes reales.</p>
+<div class="products" id="productList">Cargando paquetes…</div>
+<div id="purchaseMessage" class="note" aria-live="polite"></div>
+</section>
+<section class="panel" id="ordersSection" style="margin-top:18px">
+<h3>📦 Mis pedidos</h3>
+<div id="myOrders" class="note">Cargando pedidos…</div>
 </section>
 </section>
 </main>
@@ -130,145 +142,163 @@ const SUPABASE_PUBLISHABLE_KEY="sb_publishable_FkPlGEjzNpK1SNzuNGSpHA_nu6rki7x";
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
 const $=id=>document.getElementById(id);
 function msg(t){$("message").textContent=t}
-function tab(which){$("loginForm").classList.toggle("hidden",which!=="login");$("registerForm").classList.toggle("hidden",which!=="register");$("loginTab").classList.toggle("on",which==="login");$("registerTab").classList.toggle("on",which==="register");msg("")}
-$("loginTab").onclick=()=>tab("login");$("registerTab").onclick=()=>tab("register");
+function tab(which){
+$("loginForm").classList.toggle("hidden",which!=="login");
+$("registerForm").classList.toggle("hidden",which!=="register");
+$("loginTab").classList.toggle("on",which==="login");
+$("registerTab").classList.toggle("on",which==="register");
+msg("");
+}
+$("loginTab").onclick=()=>tab("login");
+$("registerTab").onclick=()=>tab("register");
 async function showUser(user){
- $("auth").classList.add("hidden");$("shop").classList.remove("hidden");$("logout").classList.remove("hidden");
- $("welcome").textContent="Hola, "+(user.user_metadata?.username||user.email);
- await refreshDemoWallet();
- await loadDemoSubscription();
- await loadDemoProducts();
- await loadDemoOrders();
+$("auth").classList.add("hidden");
+$("shop").classList.remove("hidden");
+$("logout").classList.remove("hidden");
+$("welcome").textContent="Hola, "+(user.user_metadata?.username||user.email);
+$("accountUserId").textContent=user.id;
+$("copyAccountUserId").onclick=async()=>{
+const value=user.id;
+try{
+if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(value);}
+else{
+const field=document.createElement("textarea");
+field.value=value;field.style.position="fixed";field.style.opacity="0";
+document.body.appendChild(field);field.select();
+const copied=document.execCommand("copy");field.remove();
+if(!copied)throw new Error("copy unavailable");
+}
+$("copyAccountUserIdMessage").textContent="ID copiado.";
+}catch(_){
+$("copyAccountUserIdMessage").textContent="Mantén pulsado el ID para seleccionarlo y copiarlo.";
+}
+};
+await loadDemoSubscription();
+await loadDemoProducts();
+await loadDemoOrders();
 }
 $("registerForm").onsubmit=async e=>{
- e.preventDefault();msg("Creando cuenta…");
- const {data,error}=await db.auth.signUp({email:$("registerEmail").value.trim(),password:$("registerPassword").value,options:{data:{username:$("username").value.trim()}}});
- if(error){msg(error.message);return}
- if(data.session){await showUser(data.user);msg("")}else{msg("Cuenta creada. Revisa tu correo y confirma la dirección antes de iniciar sesión.")}
+e.preventDefault();msg("Creando cuenta…");
+const {data,error}=await db.auth.signUp({
+email:$("registerEmail").value.trim(),
+password:$("registerPassword").value,
+options:{data:{username:$("username").value.trim()}}
+});
+if(error){msg(error.message);return;}
+if(data.session){await showUser(data.user);msg("");}
+else{msg("Cuenta creada. Revisa tu correo y confirma la dirección antes de iniciar sesión.");}
 };
 $("loginForm").onsubmit=async e=>{
- e.preventDefault();msg("Iniciando sesión…");
- const {data,error}=await db.auth.signInWithPassword({email:$("loginEmail").value.trim(),password:$("loginPassword").value});
- if(error){msg(error.message);return}msg("");await showUser(data.user);
+e.preventDefault();msg("Iniciando sesión…");
+const {data,error}=await db.auth.signInWithPassword({
+email:$("loginEmail").value.trim(),
+password:$("loginPassword").value
+});
+if(error){msg(error.message);return;}
+msg("");await showUser(data.user);
 };
-$("logout").onclick=async()=>{await db.auth.signOut();$("shop").classList.add("hidden");$("auth").classList.remove("hidden");$("logout").classList.add("hidden");tab("login")};
-
-
-async function refreshDemoWallet(){
- const {data,error}=await db.rpc("demo_create_wallet");
- if(error){$("balance").textContent="No disponible";console.error(error);return;}
- $("balance").textContent="S/ "+Number(data||0).toFixed(2);
-}
-
+$("logout").onclick=async()=>{
+await db.auth.signOut();
+$("shop").classList.add("hidden");
+$("auth").classList.remove("hidden");
+$("logout").classList.add("hidden");
+tab("login");
+};
 let verifiedPlayer=null;
-
-async function verifyPlayer() {
- const input=$("playerIdInput");
- const button=$("verifyPlayerBtn");
- const cleanId=input.value.trim();
- const message=$("verificationMessage");
-
- if(!/^\d{5,24}$/.test(cleanId)){
-  message.textContent="Escribe un ID numérico válido de entre 5 y 24 dígitos.";
-  $("packagesSection").classList.add("hidden");
-  verifiedPlayer=null;
-  return;
- }
-
- button.disabled=true;
- message.textContent="Verificando tu ID con Volsever…";
- $("packagesSection").classList.add("hidden");
- verifiedPlayer=null;
-
- try {
-  const {data,error}=await db.functions.invoke("verify-freefire-id",{body:{id:cleanId}});
-  if(error) throw error;
-  if(!data || data.success!==true || typeof data.username!=="string" || !data.username.trim()){
-   message.textContent="No se encontró un jugador válido. Revisa el ID e inténtalo de nuevo.";
-   return;
-  }
-
-  verifiedPlayer={id:cleanId,username:data.username.trim()};
-  message.textContent=`✓ Jugador verificado: ${verifiedPlayer.username} · ID ${verifiedPlayer.id}`;
-  $("packagesSection").classList.remove("hidden");
-  await loadDemoProducts();
- } catch(err) {
-  console.error(err);
-  message.textContent="No se pudo verificar el ID. Inténtalo de nuevo más tarde.";
- } finally {
-  button.disabled=false;
- }
+async function verifyPlayer(){
+const input=$("playerIdInput");
+const button=$("verifyPlayerBtn");
+const cleanId=input.value.trim();
+const message=$("verificationMessage");
+if(!/^\d{5,24}$/.test(cleanId)){
+message.textContent="Escribe un ID numérico válido de entre 5 y 24 dígitos.";
+$("packagesSection").classList.add("hidden");
+verifiedPlayer=null;
+return;
 }
-
+button.disabled=true;
+message.textContent="Verificando tu ID con Volsever…";
+$("packagesSection").classList.add("hidden");
+verifiedPlayer=null;
+try{
+const {data,error}=await db.functions.invoke("verify-freefire-id",{body:{id:cleanId}});
+if(error)throw error;
+if(!data||data.success!==true||typeof data.username!=="string"||!data.username.trim()){
+message.textContent="No se encontró un jugador válido. Revisa el ID e inténtalo de nuevo.";
+return;
+}
+verifiedPlayer={id:cleanId,username:data.username.trim()};
+message.textContent=`✓ Jugador verificado: ${verifiedPlayer.username} · ID ${verifiedPlayer.id}`;
+$("packagesSection").classList.remove("hidden");
+await loadDemoProducts();
+}catch(err){
+console.error(err);
+message.textContent="No se pudo verificar el ID. Inténtalo de nuevo más tarde.";
+}finally{button.disabled=false;}
+}
 $("verifyPlayerBtn").addEventListener("click",verifyPlayer);
 $("playerIdInput").addEventListener("keydown",e=>{
- if(e.key==="Enter"){e.preventDefault();verifyPlayer();}
+if(e.key==="Enter"){e.preventDefault();verifyPlayer();}
 });
-
 async function loadDemoProducts(){
- const box=$("productList");
- const {data,error}=await db.from("demo_products").select("id,name,diamonds,cost_credits").eq("active",true).order("cost_credits");
- if(error){box.textContent="No se pudieron cargar los paquetes demo: "+error.message;return;}
- if(!data?.length){box.textContent="No hay paquetes demo.";return;}
- box.innerHTML=data.map(p=>`<div class="pack"><div class="gem">💎</div><b>${escapeText(p.name)}</b>
- <div class="price">${Number(p.diamonds).toLocaleString("es-PE")} diamantes</div>
- <div class="muted">S/ ${Number(p.cost_soles).toFixed(2)} · saldo de prueba</div>
- <button class="primary" type="button" data-buy="${p.id}" style="width:100%;margin-top:8px">Comprar (demo)</button></div>`).join("");
- box.querySelectorAll("[data-buy]").forEach(btn=>btn.addEventListener("click",async()=>{
-  if(!verifiedPlayer){$("purchaseMessage").textContent="Primero verifica tu ID de jugador.";return;}
-  btn.disabled=true;$("purchaseMessage").textContent="Procesando compra demo…";
-  const {data:orderId,error}=await db.rpc("demo_buy_package",{p_product_id:btn.dataset.buy});
-  btn.disabled=false;
-  if(error){$("purchaseMessage").textContent=error.message;return;}
-  $("purchaseMessage").textContent="Compra demo registrada. No se entregaron diamantes reales. Referencia: "+orderId;
-  await refreshDemoWallet();await loadDemoOrders();
- }));
+const box=$("productList");
+const {data,error}=await db.from("demo_products").select("id,name,diamonds,cost_soles").eq("active",true).order("cost_soles");
+if(error){box.textContent="No se pudieron cargar los paquetes demo: "+error.message;return;}
+if(!data?.length){box.textContent="No hay paquetes demo.";return;}
+box.innerHTML=data.map(p=>`<div class="pack"><div class="gem">💎</div><b>${escapeText(p.name)}</b>
+<div class="price">${Number(p.diamonds).toLocaleString("es-PE")} diamantes</div>
+<div class="muted">Precio ilustrativo: S/ ${Number(p.cost_soles).toFixed(2)}</div>
+<p class="note">Catálogo de demostración; compra no disponible.</p></div>`).join("");
+$("purchaseMessage").textContent="Los paquetes se muestran solo como catálogo. No hay saldo, cobros ni entregas.";
 }
 async function loadDemoOrders(){
- const box=$("myOrders");
- const {data,error}=await db.from("demo_orders").select("id,product_name,diamonds,cost_credits,created_at").order("created_at",{ascending:false}).limit(20);
- if(error){box.textContent="No se pudo cargar el historial demo: "+error.message;return;}
- if(!data?.length){box.textContent="Todavía no tienes compras demo.";return;}
- box.innerHTML=data.map(o=>`<div style="padding:10px;margin:8px 0;background:#0b1426;border:1px solid #284875;border-radius:9px">
- <b>${escapeText(o.product_name)}</b> · ${Number(o.diamonds).toLocaleString("es-PE")} diamantes<br>
- <span class="muted">S/ ${Number(o.cost_soles).toFixed(2)} · ${new Date(o.created_at).toLocaleString("es-PE")}</span></div>`).join("");
+const box=$("myOrders");
+const {data,error}=await db.from("demo_orders").select("id,product_name,diamonds,cost_soles,created_at").order("created_at",{ascending:false}).limit(20);
+if(error){box.textContent="No se pudo cargar el historial demo: "+error.message;return;}
+if(!data?.length){box.textContent="Todavía no tienes compras demo.";return;}
+box.innerHTML=data.map(o=>`<div style="padding:10px;margin:8px 0;background:#0b1426;border:1px solid #284875;border-radius:9px">
+<b>${escapeText(o.product_name)}</b> · ${Number(o.diamonds).toLocaleString("es-PE")} diamantes<br>
+<span class="muted">S/ ${Number(o.cost_soles).toFixed(2)} · ${new Date(o.created_at).toLocaleString("es-PE")}</span></div>`).join("");
 }
-
 function escapeText(value){
- return String(value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+return String(value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
-document.getElementById("topupForm").addEventListener("submit",e=>{
- e.preventDefault();
- const amount=Number(document.getElementById("topupAmount").value);
- const method=document.getElementById("topupMethod").value;
- const msg=document.getElementById("topupMessage");
- if(!Number.isFinite(amount)||amount<1||amount>100){msg.textContent="Elige un monto de demostración entre S/ 1 y S/ 100.";return;}
- if(!method){msg.textContent="Selecciona un método ilustrativo.";return;}
- msg.textContent=`Demostración: elegiste S/ ${amount.toFixed(2)} mediante ${method}. No se realizó ningún pago, no se creó una solicitud y tu saldo no cambió.`;
+(async()=>{
+const {data}=await db.auth.getSession();
+if(data.session?.user)await showUser(data.session.user);
+})();
+db.auth.onAuthStateChange((_event,session)=>{
+if(session?.user)showUser(session.user);
 });
-
-(async()=>{const {data}=await db.auth.getSession();if(data.session?.user)await showUser(data.session.user)})();
-db.auth.onAuthStateChange((_event,session)=>{if(session?.user)showUser(session.user)});
-
-// Suscripciones demo almacenadas en Supabase.
 async function loadDemoSubscription(){
- const info=$("subscriptionInfo");
- const {data,error}=await db.from("demo_subscription_requests").select("status,requested_at,expires_at").order("requested_at",{ascending:false}).limit(10);
- if(error){info.textContent="No se pudo consultar tu suscripción: "+error.message;return;}
- const active=(data||[]).find(r=>r.status==="approved"&&r.expires_at&&new Date(r.expires_at)>new Date());
- const pending=(data||[]).find(r=>r.status==="pending");
- if(active){info.textContent="Suscripción demo activa hasta "+new Date(active.expires_at).toLocaleDateString("es-PE")+".";$("promoSection").classList.remove("hidden");}
- else{$("promoSection").classList.add("hidden");info.textContent=pending?"Tu solicitud está pendiente de revisión.":"No tienes una suscripción demo activa.";}
- $("requestSubscriptionBtn").disabled=!!pending;
- $("requestSubscriptionBtn").textContent=pending?"Solicitud pendiente":"Solicitar suscripción demo";
+const info=$("subscriptionInfo");
+const {data,error}=await db.from("demo_subscription_requests").select("status,requested_at,expires_at").order("requested_at",{ascending:false}).limit(10);
+if(error){info.textContent="No se pudo consultar tu suscripción: "+error.message;return;}
+const active=(data||[]).find(r=>r.status==="approved"&&r.expires_at&&new Date(r.expires_at)>new Date());
+const pending=(data||[]).find(r=>r.status==="pending");
+if(active){
+info.textContent="Suscripción demo activa hasta "+new Date(active.expires_at).toLocaleDateString("es-PE")+".";
+$("promoSection").classList.remove("hidden");
+}else{
+$("promoSection").classList.add("hidden");
+info.textContent=pending?"Tu solicitud está pendiente de revisión.":"No tienes una suscripción demo activa.";
+}
+$("requestSubscriptionBtn").disabled=!!pending;
+$("requestSubscriptionBtn").textContent=pending?"Solicitud pendiente":"Solicitar suscripción demo";
 }
 $("requestSubscriptionBtn").addEventListener("click",async()=>{
- const btn=$("requestSubscriptionBtn");btn.disabled=true;$("subscriptionRequestMessage").textContent="Enviando solicitud…";
- const {error}=await db.rpc("demo_request_subscription");
- if(error){$("subscriptionRequestMessage").textContent=error.message;btn.disabled=false;return;}
- $("subscriptionRequestMessage").textContent="Solicitud guardada en Supabase. Espera la revisión autorizada.";
- await loadDemoSubscription();
+const btn=$("requestSubscriptionBtn");
+btn.disabled=true;
+$("subscriptionRequestMessage").textContent="Enviando solicitud…";
+const {error}=await db.rpc("demo_request_subscription");
+if(error){
+$("subscriptionRequestMessage").textContent=error.message;
+btn.disabled=false;
+return;
+}
+$("subscriptionRequestMessage").textContent="Solicitud guardada en Supabase. Espera la revisión autorizada.";
+await loadDemoSubscription();
 });
-
 </script>
-</body></html>
+</body>
+</html>
