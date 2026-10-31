@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Samurai Shop - Administración demo</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#080d18;--panel:#131e33;--line:#284875;--gold:#ffc857;--white:#f5f7fb;--muted:#aab8cf}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#142b50,var(--bg) 55%);color:var(--white);font-family:Arial,sans-serif}
+header,main{max-width:850px;margin:auto;padding:18px}header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ffffff20}
+.brand{font-size:21px;font-weight:900}.brand span{color:var(--gold)}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin:18px 0}
+input{width:100%;padding:12px;border-radius:9px;border:1px solid #405575;background:#0a1426;color:white;margin:6px 0 12px}
+button{cursor:pointer;border:0;border-radius:9px;padding:11px 14px;font-weight:bold;background:var(--gold);color:#151515;margin:5px 5px 5px 0}
+button.reject{background:#34445e;color:white}button:disabled{opacity:.5;cursor:wait}
+.note{font-size:13px;line-height:1.5;color:var(--muted)}.hidden{display:none!important}.item{padding:13px;margin:10px 0;background:#0b1426;border:1px solid var(--line);border-radius:10px;overflow-wrap:anywhere}
+a{color:var(--gold)}
+</style></head>
+<body>
+<header><div class="brand">⚔️ SAMURAI <span>SHOP</span> · ADMIN DEMO</div><button id="logout" class="hidden">Cerrar sesión</button></header>
+<main>
+<p class="note">Panel separado de demostración. Solo permite revisar solicitudes de suscripción ficticias; no procesa pagos ni acredita dinero real. El acceso depende de los permisos configurados en Supabase.</p>
+<section class="panel" id="auth">
+<h2>Acceso de administrador</h2>
+<form id="loginForm">
+<label>Correo electrónico</label><input id="email" type="email" autocomplete="username" required>
+<label>Contraseña</label><input id="password" type="password" autocomplete="current-password" required>
+<button type="submit">Iniciar sesión</button>
+</form><div id="authMessage" class="note" aria-live="polite"></div>
+</section>
+<section class="panel hidden" id="admin">
+<section class="panel">
+<h2>Gestión de saldo · DEMO</h2>
+<p class="note">Consulta el saldo ficticio de una cuenta y registra ajustes de prueba. No mueve dinero ni acredita pagos reales. Esta versión no habilita modificaciones de saldo desde el navegador.</p>
+<label>UUID del usuario</label><input id="balanceUserId" placeholder="Pega el UUID del usuario">
+<button id="lookupBalance">Consultar saldo demo</button>
+<div id="balanceResult" class="note" aria-live="polite"></div>
+</section>
+
+<h2>Solicitudes de suscripción pendientes</h2><p class="note">Aprobar activa únicamente una suscripción de prueba por 30 días. Rechazar solo marca la solicitud como rechazada.</p>
+<div id="adminMessage" class="note" aria-live="polite">Comprobando permisos…</div>
+<div id="requests"></div>
+<p><a href="samurai-shop-tienda-demo.html">Volver a la tienda</a></p>
+</section>
+</main>
+<script>
+const SUPABASE_URL="https://ecrtrcohuvrpnuydukkc.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_FkPlGEjzNpK1SNzuNGSpHA_nu6rki7x";
+if(!window.supabase){document.getElementById("authMessage").textContent="No se pudo cargar Supabase. Revisa tu conexión e inténtalo otra vez.";throw new Error("Supabase JS no disponible");}
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+$("loginForm").addEventListener("submit",async e=>{
+ e.preventDefault();$("authMessage").textContent="Iniciando sesión…";
+ const {data,error}=await db.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});
+ if(error){$("authMessage").textContent=error.message;return;}
+ await checkAdmin(data.user);
+});
+$("logout").onclick=async()=>{await db.auth.signOut();$("admin").classList.add("hidden");$("auth").classList.remove("hidden");$("logout").classList.add("hidden");$("authMessage").textContent="Sesión cerrada.";};
+async function checkAdmin(user){
+ $("auth").classList.add("hidden");$("logout").classList.remove("hidden");
+ const {data:profile,error}=await db.from("profiles").select("is_admin").eq("id",user.id).maybeSingle();
+ if(error||!profile?.is_admin){$("admin").classList.remove("hidden");$("adminMessage").textContent="Acceso denegado: esta cuenta no tiene permiso de administrador.";return;}
+ $("admin").classList.remove("hidden");await loadRequests();
+}
+async function loadRequests(){
+ const box=$("requests");$("adminMessage").textContent="Cargando solicitudes…";
+ const {data,error}=await db.from("demo_subscription_requests").select("id,user_id,status,requested_at").eq("status","pending").order("requested_at");
+ if(error){$("adminMessage").textContent="No se pudieron consultar solicitudes: "+error.message;return;}
+ $("adminMessage").textContent=data?.length?`Solicitudes pendientes: ${data.length}`:"No hay solicitudes pendientes.";
+ if(!data?.length){box.innerHTML="";return;}
+ box.innerHTML=data.map(r=>`<article class="item"><b>Solicitud pendiente · DEMO</b><br><span class="note">Usuario: ${esc(r.user_id)}<br>Fecha: ${new Date(r.requested_at).toLocaleString("es-PE")}</span><br><button data-id="${esc(r.id)}" data-ok="true">Aprobar 30 días demo</button><button class="reject" data-id="${esc(r.id)}" data-ok="false">Rechazar</button></article>`).join("");
+ box.querySelectorAll("button[data-id]").forEach(btn=>btn.addEventListener("click",async()=>{
+  btn.disabled=true;
+  const {error}=await db.rpc("demo_review_subscription",{p_request_id:btn.dataset.id,p_approve:btn.dataset.ok==="true"});
+  if(error){$("adminMessage").textContent="No se pudo revisar: "+error.message;btn.disabled=false;return;}
+  await loadRequests();
+ }));
+}
+
+$("lookupBalance").addEventListener("click",async()=>{
+ const id=$("balanceUserId").value.trim();
+ if(!id){$("balanceResult").textContent="Escribe el UUID del usuario.";return;}
+ $("balanceResult").textContent="Consultando…";
+ const {data,error}=await db.from("demo_wallets").select("user_id,credits,balance_soles,updated_at").eq("user_id",id).maybeSingle();
+ if(error){$("balanceResult").textContent="No se pudo consultar: "+error.message;return;}
+ if(!data){$("balanceResult").textContent="Ese usuario todavía no tiene una billetera demo.";return;}
+ $("balanceResult").textContent=`Saldo ficticio: S/ ${Number(data.balance_soles||0).toFixed(2)} · Créditos demo: ${data.credits??0} · Actualizado: ${new Date(data.updated_at).toLocaleString("es-PE")}`;
+});
+
+db.auth.getSession().then(async({data})=>{if(data.session)await checkAdmin(data.session.user);});
+</script></body></html>
