@@ -207,7 +207,7 @@ $("playerIdInput").addEventListener("keydown",e=>{
 
 async function loadDemoProducts(){
  const box=$("productList");
- const {data,error}=await db.from("demo_products").select("id,name,diamonds,cost_credits").eq("active",true).order("cost_credits");
+ const {data,error}=await db.from("demo_products").select("id,name,diamonds,cost_credits,cost_soles")
  if(error){box.textContent="No se pudieron cargar los paquetes demo: "+error.message;return;}
  if(!data?.length){box.textContent="No hay paquetes demo.";return;}
  box.innerHTML=data.map(p=>`<div class="pack"><div class="gem">💎</div><b>${escapeText(p.name)}</b>
@@ -225,8 +225,8 @@ async function loadDemoProducts(){
  }));
 }
 async function loadDemoOrders(){
- const box=$("myOrders");
- const {data,error}=await db.from("demo_orders").select("id,product_name,diamonds,cost_credits,created_at").order("created_at",{ascending:false}).limit(20);
+ const box=$("myOrders") ;
+ const {data,error}=await db.from("demo_orders").select("id,product_name,diamonds,cost_credits,cost_soles,created_at"),{ascending:false}).limit(20);
  if(error){box.textContent="No se pudo cargar el historial demo: "+error.message;return;}
  if(!data?.length){box.textContent="Todavía no tienes compras demo.";return;}
  box.innerHTML=data.map(o=>`<div style="padding:10px;margin:8px 0;background:#0b1426;border:1px solid #284875;border-radius:9px">
