@@ -240,17 +240,70 @@ $("verifyPlayerBtn").addEventListener("click",verifyPlayer);
 $("playerIdInput").addEventListener("keydown",e=>{
 if(e.key==="Enter"){e.preventDefault();verifyPlayer();}
 });
+
 async function loadDemoProducts(){
-const box=$("productList");
-const {data,error}=await db.from("demo_products").select("id,name,diamonds,cost_soles").eq("active",true).order("cost_soles");
-if(error){box.textContent="No se pudieron cargar los paquetes demo: "+error.message;return;}
-if(!data?.length){box.textContent="No hay paquetes demo.";return;}
-box.innerHTML=data.map(p=>`<div class="pack"><div class="gem">💎</div><b>${escapeText(p.name)}</b>
-<div class="price">${Number(p.diamonds).toLocaleString("es-PE")} diamantes</div>
-<div class="muted">Precio ilustrativo: S/ ${Number(p.cost_soles).toFixed(2)}</div>
-<p class="note">Catálogo de demostración; compra no disponible.</p></div>`).join("");
-$("purchaseMessage").textContent="Los paquetes se muestran solo como catálogo. No hay saldo, cobros ni entregas.";
+  const box = $("productList");
+  box.textContent = "Consultando catálogo de Central One...";
+
+  const { data, error } = await db.functions.invoke(
+    "centralone-api-",
+    { body: {} }
+  );
+
+  if(error){
+    box.textContent = "No se pudo consultar Central One: " + error.message;
+    return;
+  }
+
+  const items = data?.centralone_response?.items;
+
+  if(!Array.isArray(items)){
+    box.textContent = "Central One no devolvió un catálogo válido.";
+    return;
+  }
+
+  const prices = {
+    "FF-110-DIAMONDS": 3,
+    "FF-341-DIAMONDS": 9,
+    "FF-572-DIAMONDS": 14,
+    "FF-1166-DIAMONDS": 25,
+    "FF-2398-DIAMONDS": 50
+  };
+
+  const packages = items.filter(p =>
+    p.status === "active" &&
+    p.in_stock === true &&
+    Object.prototype.hasOwnProperty.call(prices, p.sku)
+  );
+
+  if(!packages.length){
+    box.textContent = "No hay paquetes disponibles en Central One.";
+    return;
+  }
+
+  box.innerHTML = packages.map(p => {
+    const quantity = {
+      "FF-110-DIAMONDS": 110,
+      "FF-341-DIAMONDS": 341,
+      "FF-572-DIAMONDS": 572,
+      "FF-1166-DIAMONDS": 1166,
+      "FF-2398-DIAMONDS": 2398
+    }[p.sku];
+
+    return `
+      <div class="pack">
+        <div class="gem">💎</div>
+        <b>${quantity.toLocaleString("es-PE")} diamantes</b>
+        <div class="price">S/ ${prices[p.sku].toFixed(2)}</div>
+        <p class="note">Catálogo consultado a Central One. Modo demostración.</p>
+      </div>
+    `;
+  }).join("");
+
+  $("purchaseMessage").textContent =
+    "Catálogo sincronizado. Las compras y entregas están desactivadas.";
 }
+  
 async function loadDemoOrders(){
   const box=$("myOrders");
   const {data:{user},error:userError}=await db.auth.getUser();
