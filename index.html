@@ -305,7 +305,7 @@ async function loadDemoProducts(){
 }
 
 
-function selectCentralOneDemoProduct(productId, diamonds){
+async function selectCentralOneDemoProduct(productId, diamonds){
   const prices = {
     110: 3,
     341: 9,
@@ -316,23 +316,37 @@ function selectCentralOneDemoProduct(productId, diamonds){
 
   const price = prices[diamonds];
 
-  if(!verifiedPlayer || !price){
+  if(!verifiedPlayer || !price || !productId){
     $("purchaseMessage").textContent =
       "No se pudo confirmar el jugador o el paquete.";
     return;
   }
 
-  $("purchaseMessage").innerHTML = `
-    <div class="panel" style="margin-top:12px">
-      <h3>💎 Confirmar paquete (DEMO)</h3>
-      <p>Jugador: <b>${escapeText(verifiedPlayer.username)}</b></p>
-      <p>ID de Free Fire: <b>${escapeText(verifiedPlayer.id)}</b></p>
-      <p>Paquete: <b>${diamonds.toLocaleString("es-PE")} diamantes</b></p>
-      <p>Precio: <b>S/ ${price.toFixed(2)}</b></p>
-      <p class="note">ID de producto Central One: ${productId}</p>
-      <p class="note">Demostración: no se envió ningún pedido ni se realizó un cobro.</p>
-    </div>
-  `;
+  $("purchaseMessage").textContent =
+    "Registrando selección de demostración...";
+
+  try{
+    const {data, error} = await db.rpc("demo_register_selection", {
+      p_product_id: productId,
+      p_product_name: "Paquete Free Fire " + diamonds,
+      p_diamonds: diamonds,
+      p_cost_soles: price,
+      p_player_id: verifiedPlayer.id
+    });
+
+    if(error) throw error;
+
+    $("purchaseMessage").textContent =
+      "¡Selección registrada! Pedido demo: " + data +
+      ". No se realizó ningún cobro ni entrega.";
+
+    await loadDemoOrders();
+
+  }catch(error){
+    console.error(error);
+    $("purchaseMessage").textContent =
+      "No se pudo registrar la selección: " + error.message;
+  }
 }
   
   
