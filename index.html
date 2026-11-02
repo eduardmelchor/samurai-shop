@@ -176,7 +176,28 @@ form .primary{width:100%;margin-top:16px}.hidden{display:none!important}
 <div class="products" id="productList">Cargando paquetes…</div>
 <div id="purchaseMessage" class="note" aria-live="polite"></div>
 </section>
-<section class="panel" id="ordersSection" style="margin-top:18px">
+<section class="panel" id="ordersSection" style="margin-top:18px"><section class="panel" id="specialProductsSection" style="margin-top:18px">
+  <h2>🎟️ Pases Booyah y fragmentos evolutivos</h2>
+  <p class="note">Selecciona el producto que deseas solicitar.</p>
+
+  <h3>🎟️ Pase Booyah</h3>
+  <p>Precio clientes: S/ 5.00</p>
+  <p>Precio revendedores: S/ 4.00</p>
+  <button class="primary" onclick="createManualRequest('pase_booyah','Pase Booyah',1)">
+    Solicitar Pase Booyah
+  </button>
+
+  <h3 style="margin-top:18px">💎 Fragmentos evolutivos</h3>
+  <div class="products">
+    <button class="primary" onclick="createManualRequest('fragmentos','100 fragmentos',100)">100 fragmentos — S/ 18.00</button>
+    <button class="primary" onclick="createManualRequest('fragmentos','200 fragmentos',200)">200 fragmentos — S/ 33.00</button>
+    <button class="primary" onclick="createManualRequest('fragmentos','300 fragmentos',300)">300 fragmentos — S/ 47.00</button>
+    <button class="primary" onclick="createManualRequest('fragmentos','600 fragmentos',600)">600 fragmentos — S/ 77.00</button>
+    <button class="primary" onclick="createManualRequest('fragmentos','1200 fragmentos',1200)">1200 fragmentos — S/ 139.00</button>
+  </div>
+
+  <div id="manualPurchaseMessage" class="note" aria-live="polite"></div>
+</section>
 <h3>📦 Mis pedidos</h3>
 <div id="myOrders" class="note">Cargando pedidos…</div>
 </section>
@@ -495,7 +516,35 @@ return;
 }
 $("subscriptionRequestMessage").textContent="Solicitud guardada en Supabase. Espera la revisión autorizada.";
 await loadDemoSubscription();
-});
+});async function createManualRequest(productType, productName, quantity) {
+  const message = $("manualPurchaseMessage");
+  message.textContent = "Registrando solicitud de prueba...";
+
+  try {
+    const { data: { user }, error: userError } = await db.auth.getUser();
+
+    if (userError || !user) {
+      throw new Error("Inicia sesión para solicitar este producto.");
+    }
+
+    const { error } = await db
+      .from("demo_manual_requests")
+      .insert({
+        user_id: user.id,
+        product_type: productType,
+        product_name: productName,
+        quantity: Number(quantity)
+      });
+
+    if (error) throw error;
+
+    message.textContent =
+      "¡Solicitud de prueba registrada! Puedes consultar su estado en el panel.";
+
+  } catch (error) {
+    message.textContent = "No se pudo registrar: " + error.message;
+  }
+  }
 </script>
 </body>
 </html>
