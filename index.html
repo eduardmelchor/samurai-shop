@@ -304,12 +304,37 @@ async function loadDemoProducts(){
     "Catálogo conectado. Selecciona un paquete para probar su identificación.";
 }
 
+
 function selectCentralOneDemoProduct(productId, diamonds){
-  $("purchaseMessage").textContent =
-    "Paquete seleccionado: " + diamonds.toLocaleString("es-PE") +
-    " diamantes. ID de producto: " + productId +
-    ". No se realizó ningún pedido.";
+  const prices = {
+    110: 3,
+    341: 9,
+    572: 14,
+    1166: 25,
+    2398: 50
+  };
+
+  const price = prices[diamonds];
+
+  if(!verifiedPlayer || !price){
+    $("purchaseMessage").textContent =
+      "No se pudo confirmar el jugador o el paquete.";
+    return;
+  }
+
+  $("purchaseMessage").innerHTML = `
+    <div class="panel" style="margin-top:12px">
+      <h3>💎 Confirmar paquete (DEMO)</h3>
+      <p>Jugador: <b>${escapeText(verifiedPlayer.username)}</b></p>
+      <p>ID de Free Fire: <b>${escapeText(verifiedPlayer.id)}</b></p>
+      <p>Paquete: <b>${diamonds.toLocaleString("es-PE")} diamantes</b></p>
+      <p>Precio: <b>S/ ${price.toFixed(2)}</b></p>
+      <p class="note">ID de producto Central One: ${productId}</p>
+      <p class="note">Demostración: no se envió ningún pedido ni se realizó un cobro.</p>
+    </div>
+  `;
 }
+  
   
   
 async function loadDemoOrders(){
