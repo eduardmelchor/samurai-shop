@@ -89,7 +89,7 @@ async function checkAdmin(user){
  $("auth").classList.add("hidden");$("logout").classList.remove("hidden");
  const {data:profile,error}=await db.from("profiles").select("is_admin").eq("id",user.id).maybeSingle();
  if(error||!profile?.is_admin){$("admin").classList.remove("hidden");$("adminMessage").textContent="Acceso denegado: esta cuenta no tiene permiso de administrador.";return;}
- $("admin").classList.remove("hidden");await Promise.all([loadRequests(),loadProducts()]);
+ $("admin").classList.remove("hidden");await Promise.all([loadRequests(),loadProducts(),loadOrders()]);
 }
 let editingProductId=null;
 
@@ -179,7 +179,79 @@ async function loadRequests(){
   await loadRequests();
  }));
 }
+async function loadOrders(){
+  const box=$("adminOrders");
+  const message=$("ordersMessage");
 
+  message.textContent="Cargando pedidos...";
+
+  const {data,error}=await db.from("demo_orders")
+    .select("id,user_id,product_name,diamonds,cost_soles,created_at,status,player_id")
+    .order("created_at",{ascending:false})
+    .limit(100);
+
+  if(error){
+    message.textContent="Error: "+error.message;
+    return;
+  }
+
+  if(!data || !data.length){
+    message.textContent="No hay pedidos registrados.";
+    box.innerHTML="";
+    return;
+  }
+
+  const states={
+    pending:"Pendiente",
+    processing:"Procesando",
+    sending:"Enviando",
+    completed:"Enviado",
+    cancelled:"Cancelado",
+    failed:"Fallido",
+    historical:"Histórico"
+  };
+
+  message.textContent="Pedidos encontrados: "+data.length;
+
+  box.innerHTML=data.map(o=>`
+    <article class="item">
+      <b>${esc(o.product_name)}</b><br>
+      <span class="note">
+        💎 ${Number(o.diamonds)} diamantes<br>
+        ID jugador: ${esc(o.player_id || "No indicado")}<br>
+        Usuario: ${esc(o.user_id)}<br>
+        Fecha: ${new Date(o.created_at).toLocaleString("es-PE")}<br>
+        Precio demo: S/ ${Number(o.cost_soles || 0).toFixed(2)}
+      </span>
+      <p>Estado: <b>${states[o.status] || esc(o.status)}</b></p>
+      <select data-order-status="${esc(o.id)}">
+        ${Object.entries(states).map(([value,label])=>
+          `<option value="${value}" ${o.status===value?"selected":""}>${label}</option>`
+        ).join("")}
+      </select>
+    </article>
+  `).join("");
+
+  box.querySelectorAll("[data-order-status]").forEach(select=>{
+    select.addEventListener("change",async()=>{
+      select.disabled=true;
+      message.textContent="Guardando estado...";
+
+      const {error}=await db.from("demo_orders")
+        .update({status:select.value})
+        .eq("id",select.dataset.orderStatus);
+
+      if(error){
+        message.textContent="Error al actualizar: "+error.message;
+      }else{
+        message.textContent="Estado actualizado correctamente.";
+        await loadOrders();
+      }
+
+      select.disabled=false;
+    });
+  });
+}
 $("lookupBalance").addEventListener("click",async()=>{
  const id=$("balanceUserId").value.trim();
  if(!id){$("balanceResult").textContent="Escribe el UUID del usuario.";return;}
