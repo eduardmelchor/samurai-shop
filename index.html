@@ -268,11 +268,11 @@ if(error){msg(error.message);return;}
 if(data.session){await showUser(data.user);msg("");}
 else{msg("Cuenta creada. Revisa tu correo y confirma la dirección antes de iniciar sesión.");}
 };
-$("#loginForm").onsubmit = async (e) => {alert("El evento de inicio de sesión funciona");
+$("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const email = $("#loginEmail").value.trim();
-  const password = $("#loginPassword").value;
+  const email = $("loginEmail").value.trim();
+  const password = $("loginPassword").value;
 
   msg("Iniciando sesión...");
 
@@ -289,11 +289,10 @@ $("#loginForm").onsubmit = async (e) => {alert("El evento de inicio de sesión f
 
     await showUser(data.user);
     msg("");
-
   } catch (error) {
     msg("Error inesperado: " + error.message);
   }
-};;
+});
 $("logout").onclick=async()=>{
 await db.auth.signOut();
 $("shop").classList.add("hidden");
