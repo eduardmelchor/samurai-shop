@@ -268,15 +268,32 @@ if(error){msg(error.message);return;}
 if(data.session){await showUser(data.user);msg("");}
 else{msg("Cuenta creada. Revisa tu correo y confirma la dirección antes de iniciar sesión.");}
 };
-$("loginForm").onsubmit=async e=>{
-e.preventDefault();msg("Iniciando sesión…");
-const {data,error}=await db.auth.signInWithPassword({
-email:$("loginEmail").value.trim(),
-password:$("loginPassword").value
-});
-if(error){msg(error.message);return;}
-msg("");await showUser(data.user);
-};
+$("#loginForm").onsubmit = async (e) => {
+  e.preventDefault();
+
+  const email = $("#loginEmail").value.trim();
+  const password = $("#loginPassword").value;
+
+  msg("Iniciando sesión...");
+
+  try {
+    const { data, error } = await db.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      msg("Error al iniciar sesión: " + error.message);
+      return;
+    }
+
+    await showUser(data.user);
+    msg("");
+
+  } catch (error) {
+    msg("Error inesperado: " + error.message);
+  }
+};;
 $("logout").onclick=async()=>{
 await db.auth.signOut();
 $("shop").classList.add("hidden");
