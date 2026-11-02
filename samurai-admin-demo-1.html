@@ -69,6 +69,16 @@ a{color:var(--gold)}
   <p class="note">Administra manualmente los pedidos.</p>
   <div id="ordersMessage" class="note">Cargando pedidos...</div>
   <div id="adminOrders"></div>
+</section><section class="panel">
+  <h2>🎟️ Gestión manual de pases y fragmentos</h2>
+  <p class="note">
+    Administra manualmente las solicitudes de Pase Booyah
+    y fragmentos evolutivos.
+  </p>
+  <div id="manualRequestsMessage" class="note">
+    Cargando solicitudes...
+  </div>
+  <div id="manualRequests"></div>
 </section>
 </main>
 <script>
@@ -89,7 +99,7 @@ async function checkAdmin(user){
  $("auth").classList.add("hidden");$("logout").classList.remove("hidden");
  const {data:profile,error}=await db.from("profiles").select("is_admin").eq("id",user.id).maybeSingle();
  if(error||!profile?.is_admin){$("admin").classList.remove("hidden");$("adminMessage").textContent="Acceso denegado: esta cuenta no tiene permiso de administrador.";return;}
- $("admin").classList.remove("hidden");await Promise.all([loadRequests(),loadProducts(),loadOrders()]);
+ $("admin").classList.remove("hidden");await Promise.all([loadRequests(),loadProducts(),loadOrders(),loadManualRequests()]);
 }
 let editingProductId=null;
 
@@ -263,4 +273,76 @@ $("lookupBalance").addEventListener("click",async()=>{
 });
 
 db.auth.getSession().then(async({data})=>{if(data.session)await checkAdmin(data.session.user);});
-</script></body></html>
+async function loadManualRequests(){
+  const box = $("manualRequests");
+  const msg = $("manualRequestsMessage");
+
+  msg.textContent = "Cargando solicitudes...";
+
+  const {data,error} = await db
+    .from("demo_manual_requests")
+    .select("id,user_id,product_type,product_name,quantity,status,created_at")
+    .order("created_at",{ascending:false})
+    .limit(100);
+
+  if(error){
+    msg.textContent = "Error: " + error.message;
+    return;
+  }
+
+  if(!data || !data.length){
+    msg.textContent = "No hay solicitudes.";
+    box.innerHTML = "";
+    return;
+  }
+
+  const labels = {
+    pending:"Pendiente",
+    processing:"Procesando",
+    sending:"Enviando",
+    sent:"Enviado",
+    cancelled:"Cancelado"
+  };
+
+  msg.textContent = "Solicitudes encontradas: " + data.length;
+
+  box.innerHTML = data.map(r => `
+    <article class="item">
+      <b>${esc(r.product_name)}</b><br>
+      <span class="note">
+        Tipo: ${esc(r.product_type)}<br>
+        Cantidad: ${Number(r.quantity)}<br>
+        Usuario: ${esc(r.user_id)}<br>
+        Fecha: ${new Date(r.created_at).toLocaleString("es-PE")}<br>
+      </span>
+      <p>Estado: <b>${labels[r.status] || r.status}</b></p>
+      <select data-manual-status="${esc(r.id)}">
+        ${Object.entries(labels).map(([value,label]) =>
+          `<option value="${value}" ${r.status===value?"selected":""}>${label}</option>`
+        ).join("")}
+      </select>
+    </article>
+  `).join("");
+
+  box.querySelectorAll("[data-manual-status]").forEach(select=>{
+    select.addEventListener("change",async()=>{
+      select.disabled = true;
+      msg.textContent = "Actualizando estado...";
+
+      const {error} = await db
+        .from("demo_manual_requests")
+        .update({status:select.value})
+        .eq("id",select.dataset.manualStatus);
+
+      if(error){
+        msg.textContent = "Error: " + error.message;
+      }else{
+        msg.textContent = "Estado actualizado.";
+        await loadManualRequests();
+      }
+
+      select.disabled = false;
+    });
+  });
+    }
+}</script></body></html>
