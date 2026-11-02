@@ -268,7 +268,7 @@ if(error){msg(error.message);return;}
 if(data.session){await showUser(data.user);msg("");}
 else{msg("Cuenta creada. Revisa tu correo y confirma la dirección antes de iniciar sesión.");}
 };
-$("#loginForm").onsubmit = async (e) => {
+$("#loginForm").onsubmit = async (e) => {alert("El evento de inicio de sesión funciona");
   e.preventDefault();
 
   const email = $("#loginEmail").value.trim();
