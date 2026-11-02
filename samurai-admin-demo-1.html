@@ -56,10 +56,19 @@ a{color:var(--gold)}
 
 <div id="productMessage" class="note"></div>
 <div id="products"></div>
-</section><h2>Solicitudes de suscripción pendientes</h2><p class="note">Aprobar activa únicamente una suscripción de prueba por 30 días. Rechazar solo marca la solicitud como rechazada.</p>
-<div id="adminMessage" class="note" aria-live="polite">Comprobando permisos…</div>
-<div id="requests"></div>
-<p><a href="index.html">Volver a la tienda</a></p>
+<section class="panel">
+  <h2>📨 Solicitudes de suscripción pendientes</h2>
+  <p class="note">Aprobar activa únicamente una suscripción de prueba.</p>
+  <div id="adminMessage" class="note">Comprobando permisos...</div>
+  <div id="requests"></div>
+  <p><a href="index.html">Volver a la tienda</a></p>
+</section>
+
+<section class="panel">
+  <h2>📦 Gestión de pedidos</h2>
+  <p class="note">Administra manualmente los pedidos.</p>
+  <div id="ordersMessage" class="note">Cargando pedidos...</div>
+  <div id="adminOrders"></div>
 </section>
 </main>
 <script>
