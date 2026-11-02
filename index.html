@@ -241,6 +241,7 @@ $("playerIdInput").addEventListener("keydown",e=>{
 if(e.key==="Enter"){e.preventDefault();verifyPlayer();}
 });
 
+
 async function loadDemoProducts(){
   const box = $("productList");
   box.textContent = "Consultando catálogo de Central One...";
@@ -251,58 +252,65 @@ async function loadDemoProducts(){
   );
 
   if(error){
-    box.textContent = "No se pudo consultar Central One: " + error.message;
+    box.textContent = "Error consultando Central One: " + error.message;
     return;
   }
 
   const items = data?.centralone_response?.items;
 
   if(!Array.isArray(items)){
-    box.textContent = "Central One no devolvió un catálogo válido.";
+    box.textContent = "Respuesta de catálogo no válida.";
     return;
   }
 
-  const prices = {
-    "FF-110-DIAMONDS": 3,
-    "FF-341-DIAMONDS": 9,
-    "FF-572-DIAMONDS": 14,
-    "FF-1166-DIAMONDS": 25,
-    "FF-2398-DIAMONDS": 50
+  const config = {
+    "FF-110-DIAMONDS": {diamonds:110, price:3},
+    "FF-341-DIAMONDS": {diamonds:341, price:9},
+    "FF-572-DIAMONDS": {diamonds:572, price:14},
+    "FF-1166-DIAMONDS": {diamonds:1166, price:25},
+    "FF-2398-DIAMONDS": {diamonds:2398, price:50}
   };
 
   const packages = items.filter(p =>
     p.status === "active" &&
     p.in_stock === true &&
-    Object.prototype.hasOwnProperty.call(prices, p.sku)
+    config[p.sku] &&
+    /^[0-9a-f-]{36}$/i.test(p.product_id || "")
   );
 
   if(!packages.length){
-    box.textContent = "No hay paquetes disponibles en Central One.";
+    box.textContent = "No hay paquetes disponibles.";
     return;
   }
 
   box.innerHTML = packages.map(p => {
-    const quantity = {
-      "FF-110-DIAMONDS": 110,
-      "FF-341-DIAMONDS": 341,
-      "FF-572-DIAMONDS": 572,
-      "FF-1166-DIAMONDS": 1166,
-      "FF-2398-DIAMONDS": 2398
-    }[p.sku];
+    const item = config[p.sku];
 
     return `
       <div class="pack">
         <div class="gem">💎</div>
-        <b>${quantity.toLocaleString("es-PE")} diamantes</b>
-        <div class="price">S/ ${prices[p.sku].toFixed(2)}</div>
-        <p class="note">Catálogo consultado a Central One. Modo demostración.</p>
+        <b>${item.diamonds.toLocaleString("es-PE")} diamantes</b>
+        <div class="price">S/ ${item.price.toFixed(2)}</div>
+        <button type="button" class="primary"
+          onclick="selectCentralOneDemoProduct('${p.product_id}', ${item.diamonds})">
+          Seleccionar
+        </button>
+        <p class="note">Selección de prueba. Sin compras ni entregas.</p>
       </div>
     `;
   }).join("");
 
   $("purchaseMessage").textContent =
-    "Catálogo sincronizado. Las compras y entregas están desactivadas.";
+    "Catálogo conectado. Selecciona un paquete para probar su identificación.";
 }
+
+function selectCentralOneDemoProduct(productId, diamonds){
+  $("purchaseMessage").textContent =
+    "Paquete seleccionado: " + diamonds.toLocaleString("es-PE") +
+    " diamantes. ID de producto: " + productId +
+    ". No se realizó ningún pedido.";
+}
+  
   
 async function loadDemoOrders(){
   const box=$("myOrders");
