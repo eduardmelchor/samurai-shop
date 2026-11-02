@@ -114,16 +114,62 @@ form .primary{width:100%;margin-top:16px}.hidden{display:none!important}
 <div id="subscriptionRequestMessage" class="note" aria-live="polite" style="margin-top:10px"></div>
 </section>
 <section class="panel hidden" id="promoSection" style="margin-top:18px">
-<h2>💎 Catálogo especial de Revendedores</h2>
-<p class="note">Precios especiales ilustrativos para miembros con membresía demo activa.</p>
-<div class="promo-grid">
-<article class="promo-card"><div class="promo-icon">💎</div><h3>110 diamantes</h3><p class="monthly-price">S/ 2.60</p><span class="promo-label">PRECIO RESELLER</span></article>
-<article class="promo-card"><div class="promo-icon">💎</div><h3>341 diamantes</h3><p class="monthly-price">S/ 8.00</p><span class="promo-label">PRECIO RESELLER</span></article>
-<article class="promo-card"><div class="promo-icon">💎</div><h3>572 diamantes</h3><p class="monthly-price">S/ 13.00</p><span class="promo-label">PRECIO RESELLER</span></article>
-<article class="promo-card"><div class="promo-icon">💎</div><h3>1,166 diamantes</h3><p class="monthly-price">S/ 23.50</p><span class="promo-label">PRECIO RESELLER</span></article>
-<article class="promo-card"><div class="promo-icon">💎</div><h3>2,398 diamantes</h3><p class="monthly-price">S/ 45.00</p><span class="promo-label">PRECIO RESELLER</span></article>
-<article class="promo-card"><div class="promo-icon">💎</div><h3>6,160 diamantes</h3><p class="monthly-price">S/ 115.00</p><span class="promo-label">PRECIO RESELLER</span></article>
-</div>
+  <h2>💎 Tarifas exclusivas para revendedores</h2>
+  <p class="note">Elige la cantidad que prefieres.</p>
+
+  <div class="promo-grid">
+
+    <article class="promo-card">
+      <div class="promo-icon">💎</div>
+      <h3>110 diamantes</h3>
+      <p class="monthly-price">S/ 2.60</p>
+      <button class="primary" onclick="selectResellerRate(110,2.60)">Comprar</button>
+    </article>
+
+    <article class="promo-card">
+      <div class="promo-icon">💎</div>
+      <h3>341 diamantes</h3>
+      <p class="monthly-price">S/ 8.00</p>
+      <button class="primary" onclick="selectResellerRate(341,8)">Comprar</button>
+    </article>
+
+    <article class="promo-card">
+      <div class="promo-icon">💎</div>
+      <h3>572 diamantes</h3>
+      <p class="monthly-price">S/ 13.00</p>
+      <button class="primary" onclick="selectResellerRate(572,13)">Comprar</button>
+    </article>
+
+    <article class="promo-card">
+      <div class="promo-icon">💎</div>
+      <h3>1,166 diamantes</h3>
+      <p class="monthly-price">S/ 23.50</p>
+      <button class="primary" onclick="selectResellerRate(1166,23.50)">Comprar</button>
+    </article>
+
+    <article class="promo-card">
+      <div class="promo-icon">💎</div>
+      <h3>2,398 diamantes</h3>
+      <p class="monthly-price">S/ 45.00</p>
+      <button class="primary" onclick="selectResellerRate(2398,45)">Comprar</button>
+    </article>
+
+    <article class="promo-card">
+      <div class="promo-icon">💎</div>
+      <h3>6,160 diamantes</h3>
+      <p class="monthly-price">S/ 115.00</p>
+      <button class="primary" onclick="selectResellerRate(6160,115)">Comprar</button>
+    </article>
+
+  </div>
+
+  <div class="panel" style="margin-top:12px">
+    <h3>💎 Confirmar paquete (DEMO)</h3>
+    <div id="resellerRateMessage" class="note">
+      Selecciona un paquete. No se realizan cobros ni entregas.
+    </div>
+  </div>
+</section>
 </section><section id="packagesSection" class="hidden" style="margin-top:18px">
 <h2>💎 Paquetes de diamantes</h2>
 <p class="note">ID verificado. Esta sección es una demostración: las solicitudes no generan pagos ni entregan diamantes.</p>
@@ -348,7 +394,23 @@ async function selectCentralOneDemoProduct(productId, diamonds){
       "No se pudo registrar la selección: " + error.message;
   }
 }
-  
+} // termina selectCentralOneDemoProduct
+
+function selectResellerRate(diamonds, price){
+  const message = $("resellerRateMessage");
+
+  if(!message) return;
+
+  message.innerHTML = `
+    <div class="panel" style="margin-top:12px">
+      <h3>💎 Paquete de revendedor (DEMO)</h3>
+      <p>Paquete: <b>${diamonds.toLocaleString("es-PE")} diamantes</b></p>
+      <p>Precio especial: <b>S/ ${price.toFixed(2)}</b></p>
+      <p class="note">Demostración: no se realizó ningún cobro ni entrega.</p>
+    </div>
+  `;
+}
+
   
   
 async function loadDemoOrders(){
