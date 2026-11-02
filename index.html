@@ -199,7 +199,8 @@ form .primary{width:100%;margin-top:16px}.hidden{display:none!important}
   <div id="manualPurchaseMessage" class="note" aria-live="polite"></div>
 </section>
 <h3>📦 Mis pedidos</h3>
-<div id="myOrders" class="note">Cargando pedidos…</div>
+<div id="myOrders" class="note">Cargando pedidos…</div><h3>🎟️ Mis solicitudes de Pase Booyah y fragmentos</h3>
+<div id="myManualOrders" class="note">Cargando solicitudes...</div>
 </section>
 </section>
 </main>
@@ -243,6 +244,7 @@ $("copyAccountUserIdMessage").textContent="Mantén pulsado el ID para selecciona
 await loadDemoSubscription();
 await loadDemoProducts();
 await loadDemoOrders();
+await loadMyManualOrders();
 }
 $("registerForm").onsubmit=async e=>{
 e.preventDefault();msg("Creando cuenta…");
@@ -516,35 +518,84 @@ return;
 }
 $("subscriptionRequestMessage").textContent="Solicitud guardada en Supabase. Espera la revisión autorizada.";
 await loadDemoSubscription();
-});async function createManualRequest(productType, productName, quantity) {
+});async function loadMyManualOrders(){
+  const box = $("myManualOrders");
+  box.textContent = "Cargando solicitudes...";
+
+  const {data:{user}, error:userError} = await db.auth.getUser();
+
+  if(userError || !user){
+    box.textContent = "Inicia sesión para consultar tus solicitudes.";
+    return;
+  }
+
+  const {data,error} = await db
+    .from("demo_manual_requests")
+    .select("id,product_type,product_name,quantity,status,created_at")
+    .eq("user_id",user.id)
+    .order("created_at",{ascending:false})
+    .limit(30);
+
+  if(error){
+    box.textContent = "Error: " + error.message;
+    return;
+  }
+
+  if(!data || !data.length){
+    box.textContent = "Todavía no tienes solicitudes.";
+    return;
+  }
+
+  const labels = {
+    pending:"Pendiente",
+    processing:"Procesando",
+    sending:"Enviando",
+    sent:"Enviado",
+    cancelled:"Cancelado"
+  };
+
+  box.innerHTML = data.map(r => `
+    <article class="item">
+      <b>${escapeText(r.product_name)}</b><br>
+      <span class="note">
+        Tipo: ${escapeText(r.product_type)}<br>
+        Cantidad: ${Number(r.quantity)}<br>
+        Fecha: ${new Date(r.created_at).toLocaleString("es-PE")}
+      </span>
+      <p>Estado: <b>${labels[r.status] || escapeText(r.status)}</b></p>
+    </article>
+  `).join("");
+}
+
+async function createManualRequest(productType, productName, quantity) {
   const message = $("manualPurchaseMessage");
   message.textContent = "Registrando solicitud de prueba...";
 
   try {
-    const { data: { user }, error: userError } = await db.auth.getUser();
+    const {data:{user},error:userError} = await db.auth.getUser();
 
-    if (userError || !user) {
+    if(userError || !user){
       throw new Error("Inicia sesión para solicitar este producto.");
     }
 
-    const { error } = await db
+    const {error} = await db
       .from("demo_manual_requests")
       .insert({
-        user_id: user.id,
-        product_type: productType,
-        product_name: productName,
-        quantity: Number(quantity)
+        user_id:user.id,
+        product_type:productType,
+        product_name:productName,
+        quantity:Number(quantity)
       });
 
-    if (error) throw error;
+    if(error) throw error;
 
-    message.textContent =
-      "¡Solicitud de prueba registrada! Puedes consultar su estado en el panel.";
+    message.textContent = "¡Solicitud de prueba registrada! Puedes consultar su estado abajo.";
+    await loadMyManualOrders();
 
-  } catch (error) {
+  } catch(error) {
     message.textContent = "No se pudo registrar: " + error.message;
   }
-  }
+}
 </script>
 </body>
 </html>
