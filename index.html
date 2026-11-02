@@ -35,7 +35,18 @@ form .primary{width:100%;margin-top:16px}.hidden{display:none!important}
 .promo-card .promo-icon{font-size:27px}.promo-card h3{font-size:15px;margin:7px 0;color:#ffc857}.promo-card p{font-size:11px;color:#aab8cf;line-height:1.5;margin:5px 0 0}
 .monthly-price{font-size:20px!important;font-weight:900;color:var(--blue)!important;margin:8px 0!important}.promo-label{display:inline-block;margin-top:8px;padding:5px 8px;border-radius:20px;background:#ffffff12;border:1px solid #ffffff25;font-size:9px;color:#dce8fa;font-weight:700}
 @media(max-width:380px){.promo-grid{grid-template-columns:1fr}}
-</style>
+.status-badge{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+}
+.status-pending{background:#594515;color:#ffd45c}
+.status-processing{background:#123d69;color:#65bdff}
+.status-sending{background:#49306d;color:#d4a5ff}
+.status-sent{background:#164d35;color:#75e6a5}
+.status-cancelled{background:#642b32;color:#ff9da5}</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -562,7 +573,9 @@ await loadDemoSubscription();
         Cantidad: ${Number(r.quantity)}<br>
         Fecha: ${new Date(r.created_at).toLocaleString("es-PE")}
       </span>
-      <p>Estado: <b>${labels[r.status] || escapeText(r.status)}</b></p>
+      <p>Estado: <span class="status-badge status-${r.status}">
+${labels[r.status] || escapeText(r.status)}
+</span></p>
     </article>
   `).join("");
 }
