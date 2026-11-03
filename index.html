@@ -480,17 +480,23 @@ async function selectCentralOneDemoProduct(productId, diamonds){
   `;
   }
 
-function selectResellerRate(diamonds, price){
+function selectResellerRate(diamonds, price) {
   const message = $("resellerRateMessage");
+  if (!message) return;
 
-  if(!message) return;
+  if (!verifiedPlayer) {
+    message.textContent = "Primero verifica tu ID de Free Fire.";
+    return;
+  }
 
   message.innerHTML = `
     <div class="panel" style="margin-top:12px">
-      <h3>💎 Paquete de revendedor (DEMO)</h3>
+      <h3>💎 Confirmar paquete de revendedor (DEMO)</h3>
+      <p>Jugador: <b>${escapeText(verifiedPlayer.username)}</b></p>
+      <p>ID: ${escapeText(verifiedPlayer.id)}</p>
       <p>Paquete: <b>${diamonds.toLocaleString("es-PE")} diamantes</b></p>
       <p>Precio especial: <b>S/ ${price.toFixed(2)}</b></p>
-      <p class="note">Demostración: no se realizó ningún cobro ni entrega.</p>
+      <p class="note">Demostración: no hay cobros ni entregas.</p>
     </div>
   `;
 }
