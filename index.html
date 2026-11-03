@@ -553,33 +553,38 @@ async function confirmResellerDemoSelection(diamonds, price) {
   
   
 async function loadDemoOrders(){
-  const box=$("myOrders");
-  const {data:{user},error:userError}=await db.auth.getUser();
+  const box = $("myOrders");
 
-  if(userError||!user){
-    box.textContent="Inicia sesión para consultar tus pedidos.";
-    return;
-  }
+  box.textContent = "Consultando estados de pedidos...";
 
-  const {data,error}=await db.from("demo_orders")
-    .select("id,product_name,diamonds,cost_soles,created_at")
-    .eq("user_id",user.id)
-    .order("created_at",{ascending:false})
-    .limit(20);
+  const { data, error } = await db.functions.invoke(
+    "demo-order-status",
+    { body: {} }
+  );
 
   if(error){
-    box.textContent="No se pudo cargar tu historial: "+error.message;
+    box.textContent = "No se pudieron consultar los pedidos: " + error.message;
     return;
   }
 
-  if(!data?.length){
-    box.textContent="Todavía no tienes compras demo.";
+  if(!data?.success || !Array.isArray(data.orders)){
+    box.textContent = "No se pudo obtener el historial.";
     return;
   }
 
-  box.innerHTML=data.map(o=>`<div style="padding:10px;margin:8px 0;background:#0b1426;border:1px solid #284875;border-radius:9px">
-    <b>${escapeText(o.product_name)}</b> · ${Number(o.diamonds).toLocaleString("es-PE")} diamantes<br>
-    <span class="muted">S/ ${Number(o.cost_soles).toFixed(2)} · ${new Date(o.created_at).toLocaleString("es-PE")}</span></div>`).join("");
+  if(!data.orders.length){
+    box.textContent = "Todavía no tienes pedidos demo.";
+    return;
+  }
+
+  box.innerHTML = data.orders.map(order => `
+    <div style="padding:10px;margin:8px 0;background:#0b1426;border:1px solid #284875;border-radius:9px">
+      <b>${escapeText(order.product_name)}</b>
+      <p>${Number(order.diamonds).toLocaleString("es-PE")} diamantes</p>
+      <p><b>Estado:</b> ${escapeText(order.status_label)}</p>
+      <span class="muted">${new Date(order.created_at).toLocaleString("es-PE")}</span>
+    </div>
+  `).join("");
 }
 function escapeText(value){
 return String(value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
