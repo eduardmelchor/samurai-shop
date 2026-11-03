@@ -496,9 +496,58 @@ function selectResellerRate(diamonds, price) {
       <p>ID: ${escapeText(verifiedPlayer.id)}</p>
       <p>Paquete: <b>${diamonds.toLocaleString("es-PE")} diamantes</b></p>
       <p>Precio especial: <b>S/ ${price.toFixed(2)}</b></p>
-      <p class="note">Demostración: no hay cobros ni entregas.</p>
+      <button class="primary" type="button"
+        onclick="confirmResellerDemoSelection(${diamonds}, ${price})">
+        CONFIRMAR SOLICITUD DEMO
+      </button>
+      <p class="note">Demostración: no se realiza ningún cobro ni entrega.</p>
     </div>
   `;
+}
+
+async function confirmResellerDemoSelection(diamonds, price) {
+  if (!verifiedPlayer) return;
+
+  const productIds = {
+    110: "e7d8be5d-de17-4731-a3a0-9c6554c5ca78",
+    341: "bb0a8212-916e-4c9a-ad22-170fa9732734",
+    572: "0cbc02a5-2e65-41d3-899e-917abd1a2dd1",
+    1166: "afad588d-54f9-4227-9c6b-9889a9135370",
+    2398: "72b92180-b858-41fc-8e9d-bc402c16db80",
+    6160: "e839259e-79e5-474e-b6e8-0c83f876ac6a"
+  };
+
+  const productId = productIds[diamonds];
+  const message = $("resellerRateMessage");
+
+  if (!productId) {
+    message.textContent = "Paquete no reconocido.";
+    return;
+  }
+
+  message.textContent = "Registrando solicitud de demostración...";
+
+  try {
+    const { data, error } = await db.rpc("demo_register_selection", {
+      p_product_id: productId,
+      p_product_name: "Paquete Free Fire " + diamonds,
+      p_diamonds: diamonds,
+      p_cost_soles: price,
+      p_player_id: verifiedPlayer.id
+    });
+
+    if (error) throw error;
+
+    message.textContent =
+      "¡Solicitud demo registrada! Referencia: " + data +
+      ". No se realizó ningún cobro ni entrega.";
+
+    await loadDemoOrders();
+  } catch (error) {
+    console.error(error);
+    message.textContent =
+      "No se pudo registrar la solicitud demo: " + error.message;
+  }
 }
 
   
