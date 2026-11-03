@@ -389,7 +389,7 @@ async function loadDemoProducts(){
         <b>${item.diamonds.toLocaleString("es-PE")} diamantes</b>
         <div class="price">S/ ${item.price.toFixed(2)}</div>
         <button type="button" class="primary"
-          onclick="selectCentralOneDemoProduct('${p.product_id}', ${item.diamonds})">
+          onclick="previewCentralOneDemoProduct('${p.product_id}', ${item.diamonds})">
           Seleccionar
         </button>
         <p class="note">Selección de prueba. Sin compras ni entregas.</p>
@@ -446,6 +446,39 @@ async function selectCentralOneDemoProduct(productId, diamonds){
       "No se pudo registrar la selección: " + error.message;
   }
 } // termina selectCentralOneDemoProduct
+  function previewCentralOneDemoProduct(productId, diamonds) {
+  const prices = {
+    110: 3,
+    341: 9,
+    572: 14,
+    1166: 25,
+    2398: 50,
+    6160: 125
+  };
+
+  const price = prices[diamonds];
+
+  if (!verifiedPlayer || !price || !productId) {
+    $("purchaseMessage").textContent =
+      "No se pudo confirmar el jugador o el paquete.";
+    return;
+  }
+
+  $("purchaseMessage").innerHTML = `
+    <div class="panel" style="margin-top:12px">
+      <h3>💎 Confirmar paquete</h3>
+      <p>Jugador: <b>${escapeText(verifiedPlayer.username)}</b></p>
+      <p>ID: ${escapeText(verifiedPlayer.id)}</p>
+      <p>Paquete: <b>${diamonds.toLocaleString("es-PE")} diamantes</b></p>
+      <p>Precio: <b>S/ ${price.toFixed(2)}</b></p>
+      <button class="primary" type="button"
+        onclick="selectCentralOneDemoProduct('${productId}', ${diamonds})">
+        CONFIRMAR SOLICITUD DEMO
+      </button>
+      <p class="note">Demostración: no se realiza ningún cobro ni entrega.</p>
+    </div>
+  `;
+  }
 
 function selectResellerRate(diamonds, price){
   const message = $("resellerRateMessage");
