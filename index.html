@@ -656,7 +656,7 @@ await loadDemoSubscription();
 
   const {data,error} = await db
     .from("demo_manual_requests")
-    .select("id,product_type,product_name,quantity,status,created_at")
+    .select("id,product_type,product_name,quantity,player_id,status,created_at")
     .eq("user_id",user.id)
     .order("created_at",{ascending:false})
     .limit(30);
@@ -684,8 +684,9 @@ await loadDemoSubscription();
       <b>${escapeText(r.product_name)}</b><br>
       <span class="note">
         Tipo: ${escapeText(r.product_type)}<br>
-        Cantidad: ${Number(r.quantity)}<br>
-        Fecha: ${new Date(r.created_at).toLocaleString("es-PE")}
+Cantidad: ${Number(r.quantity)}<br>
+ID de Free Fire: ${escapeText(r.player_id || "No indicado")}<br>
+Fecha: ${new Date(r.created_at).toLocaleString("es-PE")}
       </span>
       <p>Estado: <span class="status-badge status-${r.status}">
 ${labels[r.status] || escapeText(r.status)}
@@ -699,27 +700,32 @@ async function createManualRequest(productType, productName, quantity) {
   message.textContent = "Registrando solicitud de prueba...";
 
   try {
-    const {data:{user},error:userError} = await db.auth.getUser();
+    const { data: user, error: userError } = await db.auth.getUser();
 
-    if(userError || !user){
+    if (userError || !user) {
       throw new Error("Inicia sesión para solicitar este producto.");
     }
 
-    const {error} = await db
+    if (!verifiedPlayer) {
+      throw new Error("Primero verifica tu ID de Free Fire.");
+    }
+
+    const { error } = await db
       .from("demo_manual_requests")
       .insert({
-        user_id:user.id,
-        product_type:productType,
-        product_name:productName,
-        quantity:Number(quantity)
+        user_id: user.id,
+        product_type: productType,
+        product_name: productName,
+        quantity: Number(quantity),
+        player_id: verifiedPlayer.id
       });
 
-    if(error) throw error;
+    if (error) throw error;
 
-    message.textContent = "¡Solicitud de prueba registrada! Puedes consultar su estado abajo.";
+    message.textContent = "¡Solicitud de prueba registrada!";
     await loadMyManualOrders();
 
-  } catch(error) {
+  } catch (error) {
     message.textContent = "No se pudo registrar: " + error.message;
   }
 }
