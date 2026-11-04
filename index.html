@@ -369,11 +369,10 @@ async function loadDemoProducts(){
   };
 
   const packages = items.filter(p =>
-    p.status === "active" &&
-    p.in_stock === true &&
-    config[p.sku] &&
-    /^[0-9a-f-]{36}$/i.test(p.product_id || "")
-  );
+  p.status === "active" &&
+  p.in_stock === true &&
+  config[p.sku]
+);
 
   if(!packages.length){
     box.textContent = "No hay paquetes disponibles.";
