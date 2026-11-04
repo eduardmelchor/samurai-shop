@@ -595,7 +595,7 @@ if(data.session?.user)await showUser(data.session.user);
 db.auth.onAuthStateChange((_event,session)=>{
 if(session?.user)showUser(session.user);
 });
-async function loadDemoSubscription(){
+async function loadDemoOrders.(){
   const info=$("subscriptionInfo");
   const {data,error}=await db.from("demo_subscription_requests")
     .select("status,requested_at,expires_at")
@@ -615,7 +615,11 @@ async function loadDemoSubscription(){
   if(active){
     info.textContent="Suscripción demo activa hasta "+
       new Date(active.expires_at).toLocaleDateString("es-PE")+".";
-    $("promoSection").classList.remove("hidden");
+    if(verifiedPlayer){
+  $("promoSection").classList.remove("hidden");
+}else{
+  $("promoSection").classList.add("hidden");
+    }
     $("subscriptionRequestMessage").textContent="Tu membresía demo está activa.";
   }else{
     $("promoSection").classList.add("hidden");
