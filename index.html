@@ -595,7 +595,7 @@ if(data.session?.user)await showUser(data.session.user);
 db.auth.onAuthStateChange((_event,session)=>{
 if(session?.user)showUser(session.user);
 });
-async function loadDemoOrders.(){
+async function loadDemoSubscription(){
   const info=$("subscriptionInfo");
   const {data,error}=await db.from("demo_subscription_requests")
     .select("status,requested_at,expires_at")
