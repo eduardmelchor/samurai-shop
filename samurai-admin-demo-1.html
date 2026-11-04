@@ -255,25 +255,25 @@ const filteredData=data.filter(o=>
 
  message.textContent="Pedidos encontrados: "+filteredData.length;
 
-  box.innerHTML=filteredData.map(o=>{
-    <article class="item">
-      <b>${esc(o.product_name)}</b><br>
-      <span class="note">
-        💎 ${Number(o.diamonds)} diamantes<br>
-        ID jugador: ${esc(o.player_id || "No indicado")}<br>
-        Usuario: ${esc(o.user_id)}<br>
-        Fecha: ${new Date(o.created_at).toLocaleString("es-PE")}<br>
-        Precio demo: S/ ${Number(o.cost_soles || 0).toFixed(2)}
-        Referencia: ${esc(o.demo_reference || "Sin referencia")}<br>
-      </span>
-      <p>Estado: <b>${states[o.status] || esc(o.status)}</b></p>
-      <select data-order-status="${esc(o.id)}">
-        ${Object.entries(states).map(([value,label])=>
-          `<option value="${value}" ${o.status===value?"selected":""}>${label}</option>`
-        ).join("")}
-      </select>
-    </article>
-  `).join("");
+  box.innerHTML = filteredData.map(o => `
+  <article class="item">
+    <b>${esc(o.product_name)}</b><br>
+    <span class="note">
+      💎 ${Number(o.diamonds)} diamantes<br>
+      ID jugador: ${esc(o.player_id || "No indicado")}<br>
+      Usuario: ${esc(o.user_id)}<br>
+      Fecha: ${new Date(o.created_at).toLocaleString("es-PE")}<br>
+      Precio demo: S/ ${Number(o.cost_soles || 0).toFixed(2)}<br>
+      Referencia: ${esc(o.demo_reference || "Sin referencia")}<br>
+    </span>
+    <p>Estado: <b>${states[o.status] || esc(o.status)}</b></p>
+    <select data-order-status="${esc(o.id)}">
+      ${Object.entries(states).map(([value,label]) =>
+        `<option value="${value}" ${o.status===value?"selected":""}>${label}</option>`
+      ).join("")}
+    </select>
+  </article>
+`).join("");
 
   box.querySelectorAll("[data-order-status]").forEach(select=>{
     select.addEventListener("change",async()=>{
