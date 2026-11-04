@@ -294,7 +294,7 @@ const filteredData=data.filter(o=>
       select.disabled=false;
     });
   });
-}
+$("orderSearch").addEventListener("input", loadOrders);}
 $("lookupBalance").addEventListener("click",async()=>{
  const id=$("balanceUserId").value.trim();
  if(!id){$("balanceResult").textContent="Escribe el UUID del usuario.";return;}
