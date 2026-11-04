@@ -196,7 +196,7 @@ async function loadOrders(){
   message.textContent="Cargando pedidos...";
 
   const {data,error}=await db.from("demo_orders")
-    .select("id,user_id,product_name,diamonds,cost_soles,created_at,status,player_id")
+    .select("id,user_id,product_name,diamonds,cost_soles,created_at,status,player_id,demo_reference")
     .order("created_at",{ascending:false})
     .limit(100);
 
@@ -232,6 +232,7 @@ async function loadOrders(){
         Usuario: ${esc(o.user_id)}<br>
         Fecha: ${new Date(o.created_at).toLocaleString("es-PE")}<br>
         Precio demo: S/ ${Number(o.cost_soles || 0).toFixed(2)}
+        Referencia: ${esc(o.demo_reference || "Sin referencia")}<br>
       </span>
       <p>Estado: <b>${states[o.status] || esc(o.status)}</b></p>
       <select data-order-status="${esc(o.id)}">
