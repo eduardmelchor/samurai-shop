@@ -67,6 +67,11 @@ a{color:var(--gold)}
 <section class="panel">
   <h2>📦 Gestión de pedidos</h2>
   <p class="note">Administra manualmente los pedidos.</p>
+  <input
+  id="orderSearch"
+  type="search"
+  placeholder="Buscar por referencia, ID o paquete..."
+>
   <div id="ordersMessage" class="note">Cargando pedidos...</div>
   <div id="adminOrders"></div>
 </section><section class="panel">
@@ -204,12 +209,19 @@ async function loadOrders(){
     message.textContent="Error: "+error.message;
     return;
   }
+  const term=$("orderSearch").value.trim().toLowerCase();
+const filteredData=data.filter(o=>
+  (o.demo_reference||"").toLowerCase().includes(term) ||
+  (o.player_id||"").toLowerCase().includes(term) ||
+  (o.product_name||"").toLowerCase().includes(term)
+);
 
-  if(!data || !data.length){
-    message.textContent="No hay pedidos registrados.";
-    box.innerHTML="";
-    return;
+  if(!filteredData.length){
+  message.textContent="No se encontraron pedidos.";
+  box.innerHTML="";
+  return;
   }
+    message.textContent="Pedidos encontrados: "+filteredData.length;
 
   const states={
     pending:"Pendiente",
@@ -221,9 +233,9 @@ async function loadOrders(){
     historical:"Histórico"
   };
 
-  message.textContent="Pedidos encontrados: "+data.length;
+ message.textContent="Pedidos encontrados: "+filteredData.length;
 
-  box.innerHTML=data.map(o=>`
+  box.innerHTML=filteredData.map(o=>{
     <article class="item">
       <b>${esc(o.product_name)}</b><br>
       <span class="note">
