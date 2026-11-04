@@ -93,6 +93,7 @@ if(!window.supabase){document.getElementById("authMessage").textContent="No se p
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  $("authMessage").textContent="JavaScript cargado correctamente.";
 $("loginForm").addEventListener("submit",async e=>{
  e.preventDefault();
  const msg=$("authMessage");
