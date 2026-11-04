@@ -94,10 +94,29 @@ const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 $("loginForm").addEventListener("submit",async e=>{
- e.preventDefault();$("authMessage").textContent="Iniciando sesión…";
- const {data,error}=await db.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});
- if(error){$("authMessage").textContent=error.message;return;}
- await checkAdmin(data.user);
+ e.preventDefault();
+ const msg=$("authMessage");
+ const btn=$("loginForm").querySelector('button[type="submit"]');
+ msg.textContent="Conectando con Supabase...";
+ btn.disabled=true;
+
+ try{
+   const {data,error}=await db.auth.signInWithPassword({
+     email:$("email").value.trim(),
+     password:$("password").value
+   });
+
+   if(error){
+     msg.textContent="Error de acceso: "+error.message;
+     return;
+   }
+
+   await checkAdmin(data.user);
+ }catch(err){
+   msg.textContent="Error inesperado: "+(err.message||String(err));
+ }finally{
+   btn.disabled=false;
+ }
 });
 $("logout").onclick=async()=>{await db.auth.signOut();$("admin").classList.add("hidden");$("auth").classList.remove("hidden");$("logout").classList.add("hidden");$("authMessage").textContent="Sesión cerrada.";};
 async function checkAdmin(user){
