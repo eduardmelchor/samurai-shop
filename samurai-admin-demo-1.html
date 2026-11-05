@@ -314,7 +314,7 @@ async function loadManualRequests(){
 
   const {data,error} = await db
     .from("demo_manual_requests")
-    .select("id,user_id,product_type,product_name,quantity,status,created_at")
+    .select("id,user_id,product_type,product_name,quantity,player_id,status,created_at")
     .order("created_at",{ascending:false})
     .limit(100);
 
@@ -346,6 +346,7 @@ async function loadManualRequests(){
         Tipo: ${esc(r.product_type)}<br>
         Cantidad: ${Number(r.quantity)}<br>
         Usuario: ${esc(r.user_id)}<br>
+        ID de Free Fire: ${esc(r.player_id || "No indicado")}<br>
         Fecha: ${new Date(r.created_at).toLocaleString("es-PE")}<br>
       </span>
       <p>Estado: <b>${labels[r.status] || r.status}</b></p>
