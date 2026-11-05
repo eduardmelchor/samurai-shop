@@ -268,7 +268,32 @@ await loadDemoProducts();
 await loadDemoOrders();
 await loadMyManualOrders();
 }
-$("registerForm").onsubmit=async e=>{
+async function loadWalletBalance(){
+  const balanceEl = $("walletBalance");
+  if(!balanceEl) return;
+
+  const {data:{user}} = await db.auth.getUser();
+
+  if(!user){
+    balanceEl.textContent = "S/ 0.00";
+    return;
+  }
+
+  const {data,error} = await db
+    .from("demo_wallets")
+    .select("balance_soles")
+    .eq("user_id",user.id)
+    .maybeSingle();
+
+  if(error){
+    balanceEl.textContent = "No disponible";
+    return;
+  }
+
+  balanceEl.textContent =
+    "S/ " + Number(data?.balance_soles || 0).toFixed(2);
+}
+  $("registerForm").onsubmit=async e=>{
 e.preventDefault();msg("Creando cuenta…");
 const {data,error}=await db.auth.signUp({
 email:$("registerEmail").value.trim(),
