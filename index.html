@@ -700,7 +700,7 @@ async function createManualRequest(productType, productName, quantity) {
   message.textContent = "Registrando solicitud de prueba...";
 
   try {
-    const { data: user, error: userError } = await db.auth.getUser();
+    const { data: { user }, error: userError } = await db.auth.getUser();
 
     if (userError || !user) {
       throw new Error("Inicia sesión para solicitar este producto.");
