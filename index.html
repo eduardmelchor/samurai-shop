@@ -113,7 +113,10 @@ form .primary{width:100%;margin-top:16px}.hidden{display:none!important}
   <h2>💰 Mi billetera SAMURAI</h2>
   <p class="muted">Saldo disponible en tu cuenta</p>
   <h2 id="walletBalance">S/ 0.00</h2>
-  <p id="walletMessage" class="note"></p>
+  <p id="walletMessage" class="note"></p><label for="walletTopupAmount">Monto de recarga (S/)</label>
+<input id="walletTopupAmount" type="number" min="1" max="500" step="0.50" placeholder="Ejemplo: 10.00">
+<button class="primary" id="requestWalletTopupBtn" type="button" style="width:100%;margin-top:10px">Solicitar recarga</button>
+<p id="walletTopupMessage" class="note" aria-live="polite"></p>
 </section>
 
 <section class="panel" id="playerVerification" style="margin-top:18px">
@@ -345,7 +348,35 @@ $("playerIdInput").addEventListener("keydown",e=>{
 if(e.key==="Enter"){e.preventDefault();verifyPlayer();}
 });
 
+$("requestWalletTopupBtn").addEventListener("click", async () => {
+  const amount = Number($("walletTopupAmount").value);
+  const message = $("walletTopupMessage");
+  const button = $("requestWalletTopupBtn");
 
+  if (!Number.isFinite(amount) || amount < 1 || amount > 500) {
+    message.textContent = "Ingresa un monto entre S/ 1 y S/ 500.";
+    return;
+  }
+
+  button.disabled = true;
+  message.textContent = "Registrando solicitud demo...";
+
+  try {
+    const { data, error } = await db.rpc(
+      "demo_request_wallet_topup",
+      { p_amount: amount }
+    );
+
+    if (error) throw error;
+
+    message.textContent = "Solicitud demo registrada. Espera la aprobación del administrador.";
+    $("walletTopupAmount").value = "";
+  } catch (error) {
+    message.textContent = "Error: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
 async function loadDemoProducts(){
   const box = $("productList");
   box.textContent = "Consultando catálogo de Central One...";
