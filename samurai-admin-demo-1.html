@@ -134,7 +134,7 @@ async function checkAdmin(user){
  $("auth").classList.add("hidden");$("logout").classList.remove("hidden");
  const {data:profile,error}=await db.from("profiles").select("is_admin").eq("id",user.id).maybeSingle();
  if(error||!profile?.is_admin){$("admin").classList.remove("hidden");$("adminMessage").textContent="Acceso denegado: esta cuenta no tiene permiso de administrador.";return;}
- $("admin").classList.remove("hidden");await Promise.all([loadRequests(),loadProducts(),loadOrders(),loadManualRequests()]);
+ $("admin").classList.remove("hidden");await Promise.all([loadRequests(),loadWalletTopups(),loadProducts(),loadOrders(),loadManualRequests()]);
 }
 let editingProductId=null;
 
@@ -316,7 +316,64 @@ $("lookupBalance").addEventListener("click",async()=>{
 });
 
 db.auth.getSession().then(async({data})=>{if(data.session)await checkAdmin(data.session.user);});
-async function loadManualRequests(){
+ async function loadWalletTopups(){
+  const box = $("walletTopups");
+  const msg = $("walletTopupsMessage");
+
+  msg.textContent = "Consultando recargas DEMO...";
+
+  const {data,error} = await db
+    .from("demo_wallet_topups")
+    .select("id,user_id,amount_soles,status,created_at,reviewed_at")
+    .order("created_at",{ascending:false})
+    .limit(100);
+
+  if(error){
+    msg.textContent = "Error: " + error.message;
+    return;
+  }
+
+  if(!data || !data.length){
+    msg.textContent = "No hay solicitudes de recarga DEMO.";
+    box.innerHTML = "";
+    return;
+  }
+
+  msg.textContent = "Solicitudes encontradas: " + data.length;
+
+  box.innerHTML = data.map(r => `
+    <article class="item">
+      <b>Recarga DEMO: S/ ${Number(r.amount_soles).toFixed(2)}</b><br>
+      <span class="note">
+        Usuario: ${esc(r.user_id)}<br>
+        Fecha: ${new Date(r.created_at).toLocaleString("es-PE")}
+      </span>
+      <p>Estado: <b>${esc(r.status)}</b></p>
+      ${r.status === "pending" ? `
+        <button data-topup="${esc(r.id)}" data-approve="true">Aprobar DEMO</button>
+        <button class="reject" data-topup="${esc(r.id)}" data-approve="false">Rechazar DEMO</button>
+      ` : ""}
+    </article>
+  `).join("");
+
+  box.querySelectorAll("[data-topup]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const {error} = await db.rpc("demo_review_wallet_topup", {
+        p_request_id: btn.dataset.topup,
+        p_approve: btn.dataset.approve === "true"
+      });
+
+      if(error){
+        msg.textContent = "Error: " + error.message;
+        return;
+      }
+
+      msg.textContent = "Solicitud DEMO actualizada.";
+      await loadWalletTopups();
+    });
+  });
+ }
+  async function loadManualRequests(){
   const box = $("manualRequests");
   const msg = $("manualRequestsMessage");
 
